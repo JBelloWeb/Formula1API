@@ -45,18 +45,37 @@ html {
     radial-gradient(at 0 100%,var(--c1) 35%,#0000 35.5%) var(--_s),
     repeating-conic-gradient(from 45deg,var(--c1) 0 25%,var(--c2) 0 50%)
      0 0/var(--s) var(--s);
-};
+}
 
-.scuderias {
+.sticky-top{
+        z-index: 2;
+    position: sticky;
+    top: 0;
+}
+
+.teams{
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    list-style: none;
+    align-items: center;
+    margin: auto;
+    width: 100%;
+    height: 4rem;
+    background-color: #111111;
 }
-.scuderias li{
-    display: inline-block;
-    width: 8%;
+
+.teams ul{
+    margin: auto;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    height: fit-content; 
+    width: fit-content;
+    flex-wrap: wrap;
+    list-style: none;
+    gap: 10px;
+}
+.teams li{
+    font-size: 0.7rem;
     background-color: var(--main-color);
     color: var(--secondary-color);
     padding: 0.5rem 1rem;
@@ -74,12 +93,10 @@ html {
 }
 
 .races {
-    z-index: 2;
-    position: sticky;
-    top: 0;
+
 
     width: 100%;
-    margin: 0 auto 1rem auto;
+    margin: 0 auto;
     padding: 1rem 0;
     text-align: center;
 

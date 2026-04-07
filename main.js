@@ -8,7 +8,7 @@ async function fetchData(urlApi){
 
 const d = document;
 const nav = d.querySelector('.races');
-const filter = d.querySelector('.scuderias');
+const filter = d.querySelector('.teams');
 const container = d.querySelector('.container');
 const scuderias = [];
 const drivers = [];
@@ -52,10 +52,13 @@ const getChampionshipInfo = async() =>{
                     case "Racing Bulls":
                         team = "visa";
                         break;
-                        case "Aston Martin":
-                            team = "astonmartin";
-                            break;
-                            default:
+                    case "Aston Martin":
+                        team = "astonmartin";
+                        break;
+                    case "Haas F1 Team":
+                        team = "Haas";
+                        break;
+                    default:
                     team = n.team_name.toLowerCase();
                     break;
             }
@@ -141,45 +144,32 @@ const instanciarDrivers = (scuderia) =>{
             container.appendChild(div);
         }
     }}
-    
-    // const instanciarRaces = () =>{
-        //     let ul = d.createElement('ul');
-        //     for(let r of races){
-            //         let li = d.createElement('li');
-            //         li.innerHTML = r;
-            //         li.addEventListener('click', ()=>{
-                //             instanciarDrivers();
-                //         })
-                //         ul.appendChild(li);
-                //         nav.appendChild(ul);
-                //     }
-                // }
                 
-                //  instanciarRaces();
-                
-                const instanciarScuderias = () =>{
-                    for(let s of scuderias){
-                        let li = d.createElement('li');
-                        li.innerHTML = s;
-                        li.addEventListener('click', ()=>{
-                            instanciarDrivers(s);
-                        })
-                        filter.appendChild(li);
-                    }
-                }
-                
-                instanciarDrivers();
-                
-                const getSessionKey = async () =>{
-                    try{
-                        const data = await fetchData(`https://api.openf1.org/v1/sessions?country_name=${race.value}&year=2026`);
-                        let session = data[data.length - 1];
-                        let key = session.session_key;
-                        return key;   
-                    }catch(error){
-                        console.error(error);
+const instanciarScuderias = () =>{
+    let ul = d.createElement('ul');
+    for(let s of scuderias){
+        let li = d.createElement('li');
+        li.innerHTML = s;
+        li.addEventListener('click', ()=>{
+            instanciarDrivers(s);
+        })
+        ul.appendChild(li);
     }
+    filter.appendChild(ul);
 }
+
+
+instanciarDrivers();
+
+const getSessionKey = async () =>{
+    try{
+        const data = await fetchData(`https://api.openf1.org/v1/sessions?country_name=${race.value}&year=2026`);
+        let session = data[data.length - 1];
+        let key = session.session_key;
+        return key;   
+    }catch(error){
+        console.error(error);
+}}
 
 const getInfo = async (num, mod) =>{
     try{
