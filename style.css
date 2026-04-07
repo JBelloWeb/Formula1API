@@ -78,32 +78,22 @@ html {
     position: sticky;
     top: 0;
 
-    width: 100vw;
-    margin: 0 auto 2rem auto;
+    width: 100%;
+    margin: 0 auto 1rem auto;
     padding: 1rem 0;
     text-align: center;
 
     background-color: rgb(213, 15, 15);
 
-    ul{
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        list-style: none;}
-
-    li{
-        background-color: var(--main-color);
-        color: var(--secondary-color);
-        padding: 0.5rem 1rem;
+    select{
+        font-family: f1_font, sans-serif;
+        width: 10rem;
+        height: 2rem;
         border-radius: 10px;
+    }
 
-        &:hover{
-            cursor: pointer;
-            background-color: var(--secondary-color);
-            color: var(--main-color);
-            outline: 1px solid var(--main-color);
-        }
+    .cancelled{
+        color: rgba(255, 0, 0, 0.648);
     }
 }
 

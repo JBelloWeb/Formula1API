@@ -20,18 +20,18 @@ class driver {
     scuderia = ''
     points = 0
     raceWinner = false
-
+    
     constructor(name, scuderia, points, winner){
         this.name = name;
         this.scuderia = scuderia;
         this.points = points;
         this.raceWinner = winner;
     }
-
+    
     set setNum(num){
         this.#number = num;
     }
-
+    
     get getNum(){
         return this.#number;
     }
@@ -49,20 +49,19 @@ const getChampionshipInfo = async() =>{
                 case "Red Bull Racing":
                     team = "redbull"
                     break;
-                case "Racing Bulls":
-                    team = "visa";
-                    break;
-                case "Aston Martin":
-                    team = "astonmartin";
-                    break;
-                default:
+                    case "Racing Bulls":
+                        team = "visa";
+                        break;
+                        case "Aston Martin":
+                            team = "astonmartin";
+                            break;
+                            default:
                     team = n.team_name.toLowerCase();
                     break;
             }
             dr.scuderia = team;
-            let is = scuderias.includes(n.team_name);
-            is == false ? scuderias.push(n.team_name) : console.log(`${n.team_name} ya está registrado`);
-            console.log(dr);
+            let is = scuderias.includes(team.toUpperCase());
+            is == false ? scuderias.push(team.toUpperCase()) : console.log(`${n.team_name} ya está registrado`);
             drivers.push(dr);
         }
         instanciarDrivers();
@@ -79,106 +78,106 @@ const instanciarDrivers = (scuderia) =>{
     for(let c of toTrash){
         c.remove();
     }
-
+    
     if(scuderia != undefined){
         let filtered = drivers.filter(d => d.scuderia.toLowerCase() == scuderia.toLowerCase());
         for(let dr of filtered){
             let div = d.createElement('div');
-                div.id = dr.getNum;
-                div.className = `card ${dr.scuderia}`;
+            div.id = dr.getNum;
+            div.className = `card ${dr.scuderia}`;
             let header = d.createElement('h2');
-                header.innerHTML = dr.name;
+            header.innerHTML = dr.name;
             let button = d.createElement('button');
             button.innerHTML = 'Ver info';
             button.addEventListener('click', async () => {
-                    let list = d.createElement('ul');
+                let list = d.createElement('ul');
                 let li1 = d.createElement('li');
-                    const points = await getInfo(dr.getNum, 'points_current');
-                    li1.innerHTML = `Puntos: ${points}`;
+                const points = await getInfo(dr.getNum, 'points_current');
+                li1.innerHTML = `Puntos: ${points}`;
                 let li2 = d.createElement('li');
                     const pos = await getInfo(dr.getNum, 'position_current');
                     li2.innerHTML = `Posición en tabla: ${pos}`;
 
-                list.appendChild(li1);
-                list.appendChild(li2);
-                div.appendChild(list);
+                    list.appendChild(li1);
+                    list.appendChild(li2);
+                    div.appendChild(list);
                 })
-
-            div.appendChild(header);
-            div.appendChild(button);
-
-            
-
-            container.appendChild(div);
-    }
-    } else{
+                
+                div.appendChild(header);
+                div.appendChild(button);
+                
+                
+                
+                container.appendChild(div);
+            }
+        } else{
             for(let dr of drivers){
-            let div = d.createElement('div');
+                let div = d.createElement('div');
                 div.id = dr.getNum;
                 div.className = `card ${dr.scuderia}`;
-            let header = d.createElement('h2');
+                let header = d.createElement('h2');
                 header.innerHTML = dr.name;
-            let button = d.createElement('button');
-            button.innerHTML = 'Ver info';
-            button.addEventListener('click', async () => {
+                let button = d.createElement('button');
+                button.innerHTML = 'Ver info';
+                button.addEventListener('click', async () => {
                     let list = d.createElement('ul');
                 let li1 = d.createElement('li');
                     const points = await getInfo(dr.getNum, 'points_current');
                     li1.innerHTML = `Puntos: ${points}`;
-                let li2 = d.createElement('li');
+                    let li2 = d.createElement('li');
                     const pos = await getInfo(dr.getNum, 'position_current');
                     li2.innerHTML = `Posición en tabla: ${pos}`;
-
-                list.appendChild(li1);
-                list.appendChild(li2);
+                    
+                    list.appendChild(li1);
+                    list.appendChild(li2);
                 div.appendChild(list);
-                })
+            })
 
             div.appendChild(header);
             div.appendChild(button);
-
             
-
+            
+            
             container.appendChild(div);
-    }
-}}
-
-// const instanciarRaces = () =>{
-//     let ul = d.createElement('ul');
-//     for(let r of races){
-//         let li = d.createElement('li');
-//         li.innerHTML = r;
-//         li.addEventListener('click', ()=>{
-//             instanciarDrivers();
-//         })
-//         ul.appendChild(li);
-//         nav.appendChild(ul);
-//     }
-// }
-
-//  instanciarRaces();
-
-const instanciarScuderias = () =>{
-    for(let s of scuderias){
-        let li = d.createElement('li');
-        li.innerHTML = s;
-        li.addEventListener('click', ()=>{
-            instanciarDrivers(s);
-        })
-        filter.appendChild(li);
-    }
-}
-
-instanciarDrivers();
-
-const getSessionKey = async () =>{
-    try{
-        const data = await fetchData(`https://api.openf1.org/v1/sessions?country_name=${race.value}&year=2026`);
-        let session = data[data.length - 1];
-        let key = session.session_key;
-        return key;   
-    }catch(error){
-        console.error(error);
+        }
+    }}
+    
+    // const instanciarRaces = () =>{
+        //     let ul = d.createElement('ul');
+        //     for(let r of races){
+            //         let li = d.createElement('li');
+            //         li.innerHTML = r;
+            //         li.addEventListener('click', ()=>{
+                //             instanciarDrivers();
+                //         })
+                //         ul.appendChild(li);
+                //         nav.appendChild(ul);
+                //     }
+                // }
+                
+                //  instanciarRaces();
+                
+                const instanciarScuderias = () =>{
+                    for(let s of scuderias){
+                        let li = d.createElement('li');
+                        li.innerHTML = s;
+                        li.addEventListener('click', ()=>{
+                            instanciarDrivers(s);
+                        })
+                        filter.appendChild(li);
+                    }
+                }
+                
+                instanciarDrivers();
+                
+                const getSessionKey = async () =>{
+                    try{
+                        const data = await fetchData(`https://api.openf1.org/v1/sessions?country_name=${race.value}&year=2026`);
+                        let session = data[data.length - 1];
+                        let key = session.session_key;
+                        return key;   
+                    }catch(error){
+                        console.error(error);
     }
 }
 
@@ -190,8 +189,11 @@ const getInfo = async (num, mod) =>{
         card.classList.add('flip');
         return data[0][mod];
     }catch(error){
-    console.error(error);
-    return 'Error';
+        console.error(error);
+        return 'Error';
+    }
 }
-}
+race.addEventListener('change', ()=>{
+    instanciarDrivers();
+})
 
