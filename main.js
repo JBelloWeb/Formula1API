@@ -1,5 +1,4 @@
-const overallAPI = 'https://api.openf1.org/v1/championship_drivers?session_key=latest&';
-const raceAPI = 'https://api.openf1.org/v1/championship_standings?session_name=race&session_key=11234&';
+const overallAPI = 'https://api.openf1.org/v1/championship_drivers?';
 
 async function fetchData(urlApi){
     const response = await fetch(urlApi);
@@ -12,8 +11,8 @@ const nav = d.querySelector('.races');
 const filter = d.querySelector('.scuderias');
 const container = d.querySelector('.container');
 const scuderias = [];
-const races = ['Australia', 'China', 'Japon']
 const drivers = [];
+const race = d.querySelector('#raceSelection');
 
 class driver {
     name = ''
@@ -157,7 +156,7 @@ const instanciarDrivers = (scuderia) =>{
 //     }
 // }
 
-// instanciarRaces();
+//  instanciarRaces();
 
 const instanciarScuderias = () =>{
     for(let s of scuderias){
@@ -172,13 +171,23 @@ const instanciarScuderias = () =>{
 
 instanciarDrivers();
 
-const getInfo = async (num, mod) =>{
-
+const getSessionKey = async () =>{
     try{
+        const data = await fetchData(`https://api.openf1.org/v1/sessions?country_name=${race.value}&year=2026`);
+        let session = data[data.length - 1];
+        let key = session.session_key;
+        return key;   
+    }catch(error){
+        console.error(error);
+    }
+}
+
+const getInfo = async (num, mod) =>{
+    try{
+        const r = await getSessionKey();
         let card = d.getElementById(num);
-        const data = await fetchData(`${overallAPI}driver_number=${num}`);
+        const data = await fetchData(`${overallAPI}session_key=${r}&driver_number=${num}`);
         card.classList.add('flip');
-        console.log(data);
         return data[0][mod];
     }catch(error){
     console.error(error);

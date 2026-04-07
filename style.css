@@ -74,7 +74,7 @@ html {
 }
 
 .races {
-
+    z-index: 2;
     position: sticky;
     top: 0;
 
@@ -83,7 +83,7 @@ html {
     padding: 1rem 0;
     text-align: center;
 
-    background-color: red;
+    background-color: rgb(213, 15, 15);
 
     ul{
         display: flex;
