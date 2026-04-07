@@ -1,0 +1,270 @@
+@font-face {
+    font-family: f1_font;
+    src: url(assets/Formula1-Bold_web.ttf);
+}
+
+:root{
+    --main-color: #ffffff;
+    --secondary-color: #111111;
+    --logo-url: url(media/logo-ferrari.png);
+}
+
+*{
+    margin: 0;
+padding: 0;
+}
+
+body{
+    font-family: f1_font, sans-serif;
+    
+}
+
+h1{
+    text-align: center;
+    padding: 2rem 0;
+    color: white;
+    background-color: rgb(213, 15, 15);
+}
+
+html {
+  --s: 104px; /* control the size*/
+  --c1: #4f4a54;
+  --c2: #ededed;
+  
+  --g1:/calc(2*var(--s)) calc(2*var(--s)) 
+       radial-gradient(at 100% 0,var(--c2) 17.5%,#0000 18%);
+  --g2:/calc(2*var(--s)) calc(2*var(--s)) 
+       radial-gradient(at 0 100%,var(--c2) 17.5%,#0000 18%);
+  --_s:0 calc(var(--s)/2)/var(--s) var(--s);
+  background:
+    calc(var(--s)/ 2) var(--s) var(--g1),
+    calc(var(--s)/-2) 0        var(--g1),
+    calc(var(--s)/-2) var(--s) var(--g2),
+    calc(var(--s)/ 2) 0        var(--g2),
+    radial-gradient(at 100% 0,var(--c1) 35%,#0000 35.5%) var(--_s),
+    radial-gradient(at 0 100%,var(--c1) 35%,#0000 35.5%) var(--_s),
+    repeating-conic-gradient(from 45deg,var(--c1) 0 25%,var(--c2) 0 50%)
+     0 0/var(--s) var(--s);
+};
+
+.scuderias {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    list-style: none;
+}
+.scuderias li{
+    display: inline-block;
+    width: 8%;
+    background-color: var(--main-color);
+    color: var(--secondary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    text-align: center;
+    height: 100%;
+    align-items: center;
+    
+    &:hover{
+        cursor: pointer;
+        background-color: var(--secondary-color);
+        color: var(--main-color);
+        outline: 1px solid var(--main-color);
+    }
+}
+
+.races {
+
+    position: sticky;
+    top: 0;
+
+    width: 100vw;
+    margin: 0 auto 2rem auto;
+    padding: 1rem 0;
+    text-align: center;
+
+    background-color: red;
+
+    ul{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        list-style: none;}
+
+    li{
+        background-color: var(--main-color);
+        color: var(--secondary-color);
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+
+        &:hover{
+            cursor: pointer;
+            background-color: var(--secondary-color);
+            color: var(--main-color);
+            outline: 1px solid var(--main-color);
+        }
+    }
+}
+
+.container{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 125px auto;
+    padding: 0 10rem;
+    gap: 3rem;
+}
+
+.card{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 15rem;
+    height: 200px;
+    padding: 1rem 0;
+    border-radius: 10px;
+    gap: 2rem;
+    box-shadow: #0000008c 0px 4px 8px;
+    background-color: var(--secondary-color);
+    outline: 5px solid var(--main-color);
+    color: var(--secondary-color);
+}
+
+.card::before{
+    content: '';
+    position:absolute;
+    aspect-ratio: 1/1;
+    width: 50px;
+    border-radius: 25px;
+    background-color: #111111;
+    top: -25px;
+    right: -25px;
+    outline: 5px solid var(--main-color);
+    outline-offset: -1px;
+}
+.card::after{
+    content: '';
+    position:absolute;
+    aspect-ratio: 1/1;
+    width: 36px;
+    top: -18px;
+    right: -18px;
+    background: var(--logo-url);
+    background-size: cover;
+    background-position: center;
+}
+
+.mclaren{
+    --main-color: #FF8000;
+    --secondary-color: #1D1D1B; 
+    --logo-url: url(media/logo-mclaren.png);
+}
+.mercedes{
+    --main-color: #C8CCCE;
+    --secondary-color: #00A19C;
+    --logo-url: url(media/logo-mercedes.png);
+}
+.redbull{
+    --main-color: #001A30;
+    --secondary-color: #FCD700;
+    --logo-url: url(media/logo-redbull.png);
+}
+.haas{
+    --main-color: #000000;
+    --secondary-color: #E60000;
+    --logo-url: url(media/logo-haas.png);
+}
+.williams{
+    --main-color: #041E42;
+    --secondary-color: #00A0E9;
+    --logo-url: url(media/logo-williams.png);
+}
+.ferrari{
+    --main-color: #DC0000;
+    --secondary-color: #FFF200;
+    --logo-url: url(media/logo-ferrari.png);
+}
+.alpine{
+    --main-color: #0050B0;
+    --secondary-color: #FD4BC7;
+    --logo-url: url(media/logo-alpine.png);
+}
+.astonmartin{
+    --main-color: #006F62;
+    --secondary-color: #CEDC00;
+    --logo-url: url(media/logo-astonmartin.png);
+}
+.audi{
+    --main-color: #1A1A1A;
+    --secondary-color: #F50537;
+    --logo-url: url(media/logo-audi.png);
+}
+.visa{
+    --main-color: #1434CB;
+    --secondary-color: #FFFFFF;
+    --logo-url: url(media/logo-visa.png);
+}
+.cadillac{
+    --main-color: #000000;
+    --secondary-color: #C5A059;
+    --logo-url: url(media/logo-cadillac.png);
+}
+
+.card h2{
+    box-shadow: #0000008c 0px 4px 8px;
+    background-color: var(--main-color);
+    color: var(--secondary-color);
+    width: 100%;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+.card button{
+    background-color: var(--main-color);
+    color: var(--secondary-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+
+    &:hover{
+        background-color: var(--secondary-color);
+        color: var(--main-color);
+        outline: 1px solid var(--main-color);
+    }
+}
+
+.card li{
+    color: var(--main-color);
+    list-style: none;
+}
+
+.flip{
+    animation: flip 0.5s ease-in-out forwards;
+    button{
+            animation: fade-out 0.25s ease-in-out forwards;
+        }
+}
+
+@keyframes flip{
+    from{
+        transform: rotateY(0);
+    }
+    to{
+        transform: rotateY(360deg);
+    }
+}
+
+@keyframes fade-out{
+    from{
+        display: block;
+    }
+    to{
+        display: none;
+    }
+    
+}
