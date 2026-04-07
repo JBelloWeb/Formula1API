@@ -7,31 +7,12 @@ async function fetchData(urlApi){
     return data;
 }
 
-
-const oldGetInfo = async (urlApi) =>{
-    for(d of drivers){    
-            try{
-                const data = await fetchData(`${urlApi}driver_number=${d}`)
-                console.log(data)
-            }
-            catch(error){
-                console.error(error);
-            }
-    }
- 
-}
-
-
-
 const d = document;
 const nav = d.querySelector('.races');
 const filter = d.querySelector('.scuderias');
 const container = d.querySelector('.container');
-
+const scuderias = [];
 const races = ['Australia', 'China', 'Japon']
-const scuderias = ['Ferrari', 'Mclaren', 'RedBull', 'AstonMartin', 'Alpine', 'Audi', 'Cadillac', 'Haas', 'Mercedes', 'Visa', 'Williams'];
-const numbers = [1, 3, 5, 6, 10, 11, 12, 14, 16, 18, 23, 27, 30, 31, 41, 43, 44, 55, 63, 77, 81, 87];
-const names = ['Norris', 'Verstappen', 'Bortoleto', 'Hadjar', 'Gasly', 'Perez', 'Antonelli', 'Alonso', 'Leclerc', 'Stroll', 'Albon', 'Hulkenberg', 'Lawson', 'Occon', 'Lindblad', 'Colapinto', 'Hamilton', 'Sainz', 'Russel', 'Bottas', 'Piastri', 'Bearman'];
 const drivers = [];
 
 class driver {
@@ -57,66 +38,42 @@ class driver {
     }
 }
 
-let i = 0;
-for(let n of numbers){
-    let dr = new driver;
-    dr.name = names[i];
-    dr.setNum = n;
-
-    //Asociar escuderia a cada piloto
-     switch(n){
-        case 1:
-        case 81:
-            dr.scuderia = 'mclaren';
-            break;
-        case 3:
-        case 6:
-            dr.scuderia = 'redbull';
-            break;
-        case 5:
-        case 27:
-            dr.scuderia = 'audi';
-            break;
-        case 10:
-        case 43:
-            dr.scuderia = 'alpine';
-            break;
-        case 11:
-        case 77:
-            dr.scuderia = 'cadillac';
-            break;
-        case 12:
-        case 63:
-            dr.scuderia = 'mercedes';
-            break;
-        case 14:
-        case 18:
-            dr.scuderia = 'astonmartin';
-            break;
-        case 16:
-        case 44:
-            dr.scuderia = 'ferrari';
-            break;
-        case 23:
-        case 55:
-            dr.scuderia = 'williams';
-            break;
-        case 30:
-        case 41:
-            dr.scuderia = 'visa';
-            break;
-        case 31:
-        case 87:
-            dr.scuderia = 'haas';
-            break;
-        default:
-            break;
-     }
-
-    drivers.push(dr);
-    i++;
+const getChampionshipInfo = async() =>{
+    try{
+        const info = await fetchData('https://api.openf1.org/v1/drivers?session_key=latest');
+        for(let n of info){
+            let dr = new driver;
+            dr.name = n.last_name;
+            dr.setNum = n.driver_number;
+            let team;
+            switch(n.team_name){
+                case "Red Bull Racing":
+                    team = "redbull"
+                    break;
+                case "Racing Bulls":
+                    team = "visa";
+                    break;
+                case "Aston Martin":
+                    team = "astonmartin";
+                    break;
+                default:
+                    team = n.team_name.toLowerCase();
+                    break;
+            }
+            dr.scuderia = team;
+            let is = scuderias.includes(n.team_name);
+            is == false ? scuderias.push(n.team_name) : console.log(`${n.team_name} ya está registrado`);
+            console.log(dr);
+            drivers.push(dr);
+        }
+        instanciarDrivers();
+        instanciarScuderias();
+    } catch(error){
+        console.error(error);
+    }
+    
 }
-
+getChampionshipInfo();
 
 const instanciarDrivers = (scuderia) =>{
     let toTrash = d.querySelectorAll('.card');
@@ -213,11 +170,7 @@ const instanciarScuderias = () =>{
     }
 }
 
-instanciarScuderias();
-
 instanciarDrivers();
-
-oldGetInfo(overallAPI);
 
 const getInfo = async (num, mod) =>{
 
