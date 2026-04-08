@@ -12,20 +12,23 @@ const filter = d.querySelector('.teams');
 const container = d.querySelector('.container');
 const scuderias = [];
 const drivers = [];
-const race = d.querySelector('#raceSelection');
+const year = d.querySelector('#yearSelector');
+const race = d.querySelector('#raceSelector');
 
 class driver {
     name = ''
     #number = 0
     scuderia = ''
     points = 0
-    raceWinner = false
+    color = ''
+    picture = ''
     
-    constructor(name, scuderia, points, winner){
+    constructor(name, scuderia, points, color, picture){
         this.name = name;
         this.scuderia = scuderia;
         this.points = points;
-        this.raceWinner = winner;
+        this.color = color;
+        this.picture = picture;
     }
     
     set setNum(num){
@@ -37,9 +40,31 @@ class driver {
     }
 }
 
-const getChampionshipInfo = async() =>{
+const getSessionKey = async () =>{
     try{
-        const info = await fetchData('https://api.openf1.org/v1/drivers?session_key=latest');
+        const data = await fetchData(`https://api.openf1.org/v1/sessions?country_name=${race.value}&year=${year.value}`);
+        let session = data[data.length - 1];
+        let key = session.session_key;
+        return key;   
+    }catch(error){
+        console.error(error);
+}}
+
+const getChampionshipInfo = async() =>{
+    let cleanTeams = d.querySelectorAll('.team');
+    let cleanDrivers = d.querySelectorAll('.card');
+    for(let c of cleanTeams){
+        c.remove();
+    }
+    for(let c of cleanDrivers){
+        c.remove();
+    }
+    drivers.splice(0, drivers.length);
+    scuderias.splice(0, scuderias.length);
+
+    try{
+        const key = await getSessionKey();
+        const info = await fetchData(`https://api.openf1.org/v1/drivers?session_key= ${key}`);
         for(let n of info){
             let dr = new driver;
             dr.name = n.last_name;
@@ -56,13 +81,17 @@ const getChampionshipInfo = async() =>{
                         team = "astonmartin";
                         break;
                     case "Haas F1 Team":
-                        team = "Haas";
+                        team = "haas";
                         break;
+                    case "Alfa Romeo":
+                        team = "alfaromeo";
                     default:
                     team = n.team_name.toLowerCase();
                     break;
             }
             dr.scuderia = team;
+            dr.color = n.team_colour;
+            dr.picture = n.headshot_url;
             let is = scuderias.includes(team.toUpperCase());
             is == false ? scuderias.push(team.toUpperCase()) : console.log(`${n.team_name} ya está registrado`);
             drivers.push(dr);
@@ -88,25 +117,34 @@ const instanciarDrivers = (scuderia) =>{
             let div = d.createElement('div');
             div.id = dr.getNum;
             div.className = `card ${dr.scuderia}`;
+            div.style.setProperty(`--primary-color: #${dr.color}`)
             let header = d.createElement('h2');
             header.innerHTML = dr.name;
+            let figure = d.createElement('figure');
+            let img = d.createElement('img');
+            img.src= dr.picture;
             let button = d.createElement('button');
             button.innerHTML = 'Ver info';
             button.addEventListener('click', async () => {
+                let points;
                 let list = d.createElement('ul');
                 let li1 = d.createElement('li');
-                const points = await getInfo(dr.getNum, 'points_current');
+                points = await getInfo(dr.getNum, 'points_current');
+                if(points == null || points == "null" || points == undefined || points == "undefined"){
+                        points = "0";
+                    }      
                 li1.innerHTML = `Puntos: ${points}`;
                 let li2 = d.createElement('li');
                     const pos = await getInfo(dr.getNum, 'position_current');
                     li2.innerHTML = `Posición en tabla: ${pos}`;
-
                     list.appendChild(li1);
                     list.appendChild(li2);
                     div.appendChild(list);
                 })
                 
+                figure.appendChild(img);
                 div.appendChild(header);
+                div.appendChild(figure);
                 div.appendChild(button);
                 
                 
@@ -118,26 +156,40 @@ const instanciarDrivers = (scuderia) =>{
                 let div = d.createElement('div');
                 div.id = dr.getNum;
                 div.className = `card ${dr.scuderia}`;
+                div.style.setProperty(`--main-color`,` #${dr.color}`)
                 let header = d.createElement('h2');
                 header.innerHTML = dr.name;
+                let figure = d.createElement('figure');
+                let img = d.createElement('img');
+                img.src= dr.picture;
                 let button = d.createElement('button');
                 button.innerHTML = 'Ver info';
                 button.addEventListener('click', async () => {
-                    let list = d.createElement('ul');
+                let list = d.createElement('ul');
                 let li1 = d.createElement('li');
-                    const points = await getInfo(dr.getNum, 'points_current');
-                    li1.innerHTML = `Puntos: ${points}`;
-                    let li2 = d.createElement('li');
+                const points = await getInfo(dr.getNum, 'points_current');
+                console.log(points);
+                switch(points){
+                    case "null":
+                        points = '0';
+                        break;
+                    default:
+                        break;
+                }
+                li1.innerHTML = `Puntos: ${points}`;
+                let li2 = d.createElement('li');
                     const pos = await getInfo(dr.getNum, 'position_current');
                     li2.innerHTML = `Posición en tabla: ${pos}`;
-                    
+
                     list.appendChild(li1);
                     list.appendChild(li2);
-                div.appendChild(list);
-            })
+                    div.appendChild(list);
+                })
 
-            div.appendChild(header);
-            div.appendChild(button);
+                figure.appendChild(img);
+                div.appendChild(header);
+                div.appendChild(figure);
+                div.appendChild(button);
             
             
             
@@ -149,6 +201,7 @@ const instanciarScuderias = () =>{
     let ul = d.createElement('ul');
     for(let s of scuderias){
         let li = d.createElement('li');
+        li.className ="team";
         li.innerHTML = s;
         li.addEventListener('click', ()=>{
             instanciarDrivers(s);
@@ -161,15 +214,6 @@ const instanciarScuderias = () =>{
 
 instanciarDrivers();
 
-const getSessionKey = async () =>{
-    try{
-        const data = await fetchData(`https://api.openf1.org/v1/sessions?country_name=${race.value}&year=2026`);
-        let session = data[data.length - 1];
-        let key = session.session_key;
-        return key;   
-    }catch(error){
-        console.error(error);
-}}
 
 const getInfo = async (num, mod) =>{
     try{
@@ -177,6 +221,7 @@ const getInfo = async (num, mod) =>{
         let card = d.getElementById(num);
         const data = await fetchData(`${overallAPI}session_key=${r}&driver_number=${num}`);
         card.classList.add('flip');
+        console.log(data);
         return data[0][mod];
     }catch(error){
         console.error(error);
@@ -187,3 +232,6 @@ race.addEventListener('change', ()=>{
     instanciarDrivers();
 })
 
+year.addEventListener('change', () =>{
+    getChampionshipInfo();
+})

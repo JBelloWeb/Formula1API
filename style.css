@@ -53,6 +53,16 @@ html {
     top: 0;
 }
 
+.selectors{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+
+    width: 100%;
+    background-color: rgb(213, 15, 15);
+}
+
 .teams{
     display: flex;
     justify-content: center;
@@ -60,6 +70,7 @@ html {
     margin: auto;
     width: 100%;
     height: 4rem;
+    min-height: fit-content;
     background-color: #111111;
 }
 
@@ -92,15 +103,9 @@ html {
     }
 }
 
-.races {
-
-
-    width: 100%;
-    margin: 0 auto;
+.races, .years{
     padding: 1rem 0;
     text-align: center;
-
-    background-color: rgb(213, 15, 15);
 
     select{
         font-family: f1_font, sans-serif;
@@ -139,6 +144,7 @@ html {
     background-color: var(--secondary-color);
     outline: 5px solid var(--main-color);
     color: var(--secondary-color);
+    
 }
 
 .card::before{
@@ -153,7 +159,7 @@ html {
     outline: 5px solid var(--main-color);
     outline-offset: -1px;
 }
-.card::after{
+/* .card::after{
     content: '';
     position:absolute;
     aspect-ratio: 1/1;
@@ -163,6 +169,17 @@ html {
     background: var(--logo-url);
     background-size: cover;
     background-position: center;
+} */
+
+.card figure{
+    position:absolute;
+    aspect-ratio: 1/1;
+    width: 50px;
+    top: -18px;
+    right: -18px;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
 }
 
 .mclaren{
