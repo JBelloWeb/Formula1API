@@ -174,68 +174,17 @@ html {
 .card figure{
     position:absolute;
     aspect-ratio: 1/1;
-    width: 50px;
-    top: -18px;
-    right: -18px;
+    width: 40px;
+    border-radius: 25px;
+    top: -20px;
+    right: -20px;
     background-size: cover;
     background-position: center;
     overflow: hidden;
-}
 
-.mclaren{
-    --main-color: #FF8000;
-    --secondary-color: #1D1D1B; 
-    --logo-url: url(media/logo-mclaren.png);
-}
-.mercedes{
-    --main-color: #C8CCCE;
-    --secondary-color: #00A19C;
-    --logo-url: url(media/logo-mercedes.png);
-}
-.redbull{
-    --main-color: #001A30;
-    --secondary-color: #FCD700;
-    --logo-url: url(media/logo-redbull.png);
-}
-.haas{
-    --main-color: #000000;
-    --secondary-color: #E60000;
-    --logo-url: url(media/logo-haas.png);
-}
-.williams{
-    --main-color: #041E42;
-    --secondary-color: #00A0E9;
-    --logo-url: url(media/logo-williams.png);
-}
-.ferrari{
-    --main-color: #DC0000;
-    --secondary-color: #FFF200;
-    --logo-url: url(media/logo-ferrari.png);
-}
-.alpine{
-    --main-color: #0050B0;
-    --secondary-color: #FD4BC7;
-    --logo-url: url(media/logo-alpine.png);
-}
-.astonmartin{
-    --main-color: #006F62;
-    --secondary-color: #CEDC00;
-    --logo-url: url(media/logo-astonmartin.png);
-}
-.audi{
-    --main-color: #1A1A1A;
-    --secondary-color: #F50537;
-    --logo-url: url(media/logo-audi.png);
-}
-.visa{
-    --main-color: #1434CB;
-    --secondary-color: #FFFFFF;
-    --logo-url: url(media/logo-visa.png);
-}
-.cadillac{
-    --main-color: #000000;
-    --secondary-color: #C5A059;
-    --logo-url: url(media/logo-cadillac.png);
+    img{
+        width: 100%;
+    }
 }
 
 .card h2{
@@ -267,6 +216,11 @@ html {
     list-style: none;
 }
 
+.hide{
+    display: none;
+}
+
+
 .flip{
     animation: flip 0.5s ease-in-out forwards;
     button{
@@ -291,4 +245,14 @@ html {
         display: none;
     }
     
+}
+
+.loader {
+  width: calc(80px / cos(45deg));
+  height: 14px;
+  background: repeating-linear-gradient(-45deg,#000 0 15px,#0000 0 20px) left/200% 100%;
+  animation: l3 2s infinite linear;
+}
+@keyframes l3 {
+    100% {background-position:right}
 }
