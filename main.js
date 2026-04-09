@@ -51,6 +51,11 @@ const getSessionKey = async () =>{
 }}
 
 const getChampionshipInfo = async() =>{
+    let list = d.querySelectorAll('.teams_container');
+    for(let l of list){
+        l.remove();
+
+    }
     let cleanTeams = d.querySelectorAll('.team');
     let cleanDrivers = d.querySelectorAll('.card');
     for(let c of cleanTeams){
@@ -246,6 +251,7 @@ const instanciarDrivers = (scuderia) =>{
                 
 const instanciarScuderias = () =>{
     let ul = d.createElement('ul');
+    ul.className = "teams_container";
     for(let s of scuderias){
         let li = d.createElement('li');
         li.className ="team";

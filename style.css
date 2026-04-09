@@ -16,7 +16,7 @@ padding: 0;
 
 body{
     font-family: f1_font, sans-serif;
-    
+    background-color: #111111;    
 }
 
 h1{
@@ -26,8 +26,8 @@ h1{
     background-color: rgb(213, 15, 15);
 }
 
-html {
-  --s: 104px; /* control the size*/
+/* html {
+  --s: 104px; 
   --c1: #4f4a54;
   --c2: #ededed;
   
@@ -45,7 +45,7 @@ html {
     radial-gradient(at 0 100%,var(--c1) 35%,#0000 35.5%) var(--_s),
     repeating-conic-gradient(from 45deg,var(--c1) 0 25%,var(--c2) 0 50%)
      0 0/var(--s) var(--s);
-}
+} */
 
 .sticky-top{
         z-index: 2;
@@ -140,7 +140,7 @@ html {
     padding: 1rem 0;
     border-radius: 10px;
     gap: 2rem;
-    box-shadow: #0000008c 0px 4px 8px;
+    box-shadow: var(--main-color) 0px 0px 10px 5px;
     background-color: var(--secondary-color);
     outline: 5px solid var(--main-color);
     color: var(--secondary-color);
@@ -158,6 +158,8 @@ html {
     right: -25px;
     outline: 5px solid var(--main-color);
     outline-offset: -1px;
+    box-shadow: var(--main-color) 0px 0px 10px 5px;
+
 }
 /* .card::after{
     content: '';
@@ -188,7 +190,7 @@ html {
 }
 
 .card h2{
-    box-shadow: #0000008c 0px 4px 8px;
+    box-shadow: #111111 0px 4px 20px;
     background-color: var(--main-color);
     color: var(--secondary-color);
     width: 100%;
@@ -197,7 +199,7 @@ html {
 }
 
 .card button{
-    background-color: var(--main-color);
+    background-color: hsl(from var(--main-color) h s 50%);
     color: var(--secondary-color);
     border: none;
     padding: 0.5rem 1rem;
@@ -205,9 +207,8 @@ html {
     cursor: pointer;
 
     &:hover{
-        background-color: var(--secondary-color);
-        color: var(--main-color);
-        outline: 1px solid var(--main-color);
+            box-shadow: var(--main-color) 0px 0px 5px 1px;
+            filter: brightness(110%);
     }
 }
 
@@ -245,14 +246,4 @@ html {
         display: none;
     }
     
-}
-
-.loader {
-  width: calc(80px / cos(45deg));
-  height: 14px;
-  background: repeating-linear-gradient(-45deg,#000 0 15px,#0000 0 20px) left/200% 100%;
-  animation: l3 2s infinite linear;
-}
-@keyframes l3 {
-    100% {background-position:right}
 }
