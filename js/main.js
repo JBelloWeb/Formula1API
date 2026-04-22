@@ -1,11 +1,5 @@
 const overallAPI = 'https://api.openf1.org/v1/championship_drivers?';
 
-async function fetchData(urlApi){
-    const response = await fetch(urlApi);
-    const data = await response.json();
-    return data;
-}
-
 const d = document;
 const nav = d.querySelector('.races');
 const filter = d.querySelector('.teams');
@@ -14,8 +8,9 @@ const scuderias = [];
 const drivers = [];
 const storedFavourites = localStorage.getItem('driversFavoritos');
 const favourites = storedFavourites ? JSON.parse(storedFavourites) :  [];
-const year = d.querySelector('#yearSelector');
-const race = d.querySelector('#raceSelector');
+const year = d.getElementById('yearSelector');
+const race = d.getElementById('raceSelector');
+const btnToFavs = d.getElementById('toFavs');
 
 class driver {
     name = ''
@@ -40,6 +35,12 @@ class driver {
     get getNum(){
         return this.#number;
     }
+}
+
+async function fetchData(urlApi){
+    const response = await fetch(urlApi);
+    const data = await response.json();
+    return data;
 }
 
 const getSessionKey = async () =>{
@@ -99,7 +100,8 @@ const getChampionshipInfo = async() =>{
             dr.color = n.team_colour;
             dr.picture = n.headshot_url;
             let is = scuderias.includes(team.toUpperCase());
-            is == false ? scuderias.push(team.toUpperCase()) : console.log(`${n.team_name} ya está registrado`);
+            
+            !is ? scuderias.push(team.toUpperCase()) : console.log(`${n.team_name} ya está registrado`);
             drivers.push(dr);
         }
         instanciarDrivers();
@@ -162,6 +164,7 @@ const instanciarDrivers = (scuderia) =>{
                 });
 
                let button = d.createElement('button');
+               button.classList = 'info';
                button.innerHTML = 'Ver info';
                button.addEventListener('click', async () => {
                let list = d.createElement('ul');
@@ -243,3 +246,8 @@ race.addEventListener('change', ()=>{
 year.addEventListener('change', () =>{
     getChampionshipInfo();
 })
+
+btnToFavs.addEventListener('click', () =>{
+window.location.href = 'pages/favourites.html';
+});
+

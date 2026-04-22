@@ -123,7 +123,7 @@ h1{
     background-color: var(--secondary-color);
     outline: 5px solid var(--main-color);
     color: var(--secondary-color);
-    
+    transform-style: preserve-3d;
 }
 
 .card::before{
@@ -140,6 +140,44 @@ h1{
     box-shadow: var(--main-color) 0px 0px 10px 5px;
 
 }
+
+.card::after{
+    z-index: -1;
+    transform: translateZ(-1px);
+    position: absolute;
+    content: '';
+    bottom: 50px;
+    top: 50px;
+    left: 50px;
+    right: 50px;
+    border-radius: 40%;
+    filter: blur(10px);
+    background-color: var(--main-color);
+    margin: 0px;
+    opacity: 1;
+    transform-origin: center;
+    animation: glow-up 2s ease forwards;
+}
+ @keyframes glow-up {
+    from{
+        bottom: 50px;
+        top: 50px;
+        left: 50px;
+        right: 50px;
+        border-radius: 40%;
+        filter: blur(10px) opacity(0);
+
+    }
+    
+    to{
+        bottom: -2px;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        filter: blur(45px) opacity(0.5);
+
+    }
+ }
 
 .card figure{
     position:absolute;
@@ -202,7 +240,7 @@ button.fav{
 
 .flip{
     animation: flip 0.5s ease-in-out forwards;
-    button{
+    .info{
             animation: fade-out 0.25s ease-in-out forwards;
         }
 }
