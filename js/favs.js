@@ -16,19 +16,29 @@ async function fetchData(urlApi){
 
 const callFavourites = async() =>{
     let favsApi = driversApi;
+    
     if(favourites.length > 0){
         for(let f of favourites){
             favsApi += `last_name=${f}&`;
         }
+        
+        let founds = [];
+        let i = 0;
 
         try{
             const driversInfo = await fetchData(favsApi);
-            for(let i = 0; i < favourites.length; i++){
-                let p = d.createElement('p');
-                p.style = 'color: white;'
-                p.textContent = driversInfo[i]['country_code'];
-                console.log(driversInfo[0])
-                favSections.appendChild(p);
+            while(founds.length < favourites.length){
+                if(inArray(founds, driversInfo[i]['last_name'])){
+                    i++;
+                } else{
+                    founds.push(driversInfo[i]['last_name']);
+                    let p = d.createElement('p');
+                    p.style = 'color: white;'
+                    p.textContent = `${driversInfo[i]['last_name']} --> ${driversInfo[i]['country_code']}` ;
+                    console.log(driversInfo[0])
+                    favSections.appendChild(p);
+                    i++;
+                }
             }
             
 
