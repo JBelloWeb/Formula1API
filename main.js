@@ -54,7 +54,6 @@ const getChampionshipInfo = async() =>{
     let list = d.querySelectorAll('.teams_container');
     for(let l of list){
         l.remove();
-
     }
     let cleanTeams = d.querySelectorAll('.team');
     let cleanDrivers = d.querySelectorAll('.card');
@@ -160,93 +159,6 @@ const instanciarDrivers = (scuderia) =>{
             
             container.appendChild(div);
         }
-    
-    // if(scuderia != undefined){
-    //     let filtered = drivers.filter(d => d.scuderia.toLowerCase() == scuderia.toLowerCase());
-    //     for(let dr of filtered){
-    //         let div = d.createElement('div');
-    //         div.id = dr.getNum;
-    //         div.className = `card ${dr.scuderia}`;
-    //         div.style.setProperty(`--main-color`,` #${dr.color}`)
-    //         div.style.setProperty(`--secondary-color`,`hsl(from var(--main-color) calc(h + 180) 10 15)`)
-    //         let header = d.createElement('h2');
-    //         header.innerHTML = dr.name;
-    //         let figure = d.createElement('figure');
-    //         let img = d.createElement('img');
-    //         img.src= dr.picture;
-    //         let button = d.createElement('button');
-    //         button.innerHTML = 'Ver info';
-    //         button.addEventListener('click', async () => {
-    //             let points;
-    //             let list = d.createElement('ul');
-    //             let li1 = d.createElement('li');
-    //             points = await getInfo(dr.getNum, 'points_current');
-    //             if(points == null || points == "null" || points == undefined || points == "undefined"){
-    //                     points = "0";
-    //                 }      
-    //             li1.innerHTML = `Puntos: ${points}`;
-    //             let li2 = d.createElement('li');
-    //                 const pos = await getInfo(dr.getNum, 'position_current');
-    //                 li2.innerHTML = `Posición en tabla: ${pos}`;
-    //                 list.appendChild(li1);
-    //                 list.appendChild(li2);
-    //                 div.appendChild(list);
-    //             })
-                
-    //             figure.appendChild(img);
-    //             div.appendChild(header);
-    //             div.appendChild(figure);
-    //             div.appendChild(button);
-                
-                
-                
-    //             container.appendChild(div);
-    //         }
-    //     } else{
-    //         for(let dr of drivers){
-    //             let div = d.createElement('div');
-    //             div.id = dr.getNum;
-    //             div.className = `card ${dr.scuderia}`;
-    //             div.style.setProperty(`--main-color`,` #${dr.color}`)
-    //             div.style.setProperty(`--secondary-color`,`hsl(from var(--main-color) calc(h + 180) 10 15)`)
-    //             let header = d.createElement('h2');
-    //             header.innerHTML = dr.name;
-    //             let figure = d.createElement('figure');
-    //             let img = d.createElement('img');
-    //             img.src= dr.picture;
-    //             let button = d.createElement('button');
-    //             button.innerHTML = 'Ver info';
-    //             button.addEventListener('click', async () => {
-    //             let list = d.createElement('ul');
-    //             let li1 = d.createElement('li');
-    //             const points = await getInfo(dr.getNum, 'points_current');
-    //             console.log(points);
-    //             switch(points){
-    //                 case "null":
-    //                     points = '0';
-    //                     break;
-    //                 default:
-    //                     break;
-    //             }
-    //             li1.innerHTML = `Puntos: ${points}`;
-    //             let li2 = d.createElement('li');
-    //                 const pos = await getInfo(dr.getNum, 'position_current');
-    //                 li2.innerHTML = `Posición en tabla: ${pos}`;
-
-    //                 list.appendChild(li1);
-    //                 list.appendChild(li2);
-    //                 div.appendChild(list);
-    //             })
-
-    //             figure.appendChild(img);
-    //             div.appendChild(header);
-    //             div.appendChild(figure);
-    //             div.appendChild(button);
-            
-            
-            
-    //         container.appendChild(div);
-    //     }
 }
                 
 const instanciarScuderias = () =>{
