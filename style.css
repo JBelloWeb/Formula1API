@@ -26,27 +26,6 @@ h1{
     background-color: rgb(213, 15, 15);
 }
 
-/* html {
-  --s: 104px; 
-  --c1: #4f4a54;
-  --c2: #ededed;
-  
-  --g1:/calc(2*var(--s)) calc(2*var(--s)) 
-       radial-gradient(at 100% 0,var(--c2) 17.5%,#0000 18%);
-  --g2:/calc(2*var(--s)) calc(2*var(--s)) 
-       radial-gradient(at 0 100%,var(--c2) 17.5%,#0000 18%);
-  --_s:0 calc(var(--s)/2)/var(--s) var(--s);
-  background:
-    calc(var(--s)/ 2) var(--s) var(--g1),
-    calc(var(--s)/-2) 0        var(--g1),
-    calc(var(--s)/-2) var(--s) var(--g2),
-    calc(var(--s)/ 2) 0        var(--g2),
-    radial-gradient(at 100% 0,var(--c1) 35%,#0000 35.5%) var(--_s),
-    radial-gradient(at 0 100%,var(--c1) 35%,#0000 35.5%) var(--_s),
-    repeating-conic-gradient(from 45deg,var(--c1) 0 25%,var(--c2) 0 50%)
-     0 0/var(--s) var(--s);
-} */
-
 .sticky-top{
         z-index: 2;
     position: sticky;
@@ -161,17 +140,6 @@ h1{
     box-shadow: var(--main-color) 0px 0px 10px 5px;
 
 }
-/* .card::after{
-    content: '';
-    position:absolute;
-    aspect-ratio: 1/1;
-    width: 36px;
-    top: -18px;
-    right: -18px;
-    background: var(--logo-url);
-    background-size: cover;
-    background-position: center;
-} */
 
 .card figure{
     position:absolute;
@@ -209,6 +177,16 @@ h1{
     &:hover{
             box-shadow: var(--main-color) 0px 0px 5px 1px;
             filter: brightness(110%);
+    }
+}
+
+button.fav{
+    border: var(--main-color) 2px solid;
+    background-color: transparent;
+    padding: 0.5rem;
+    i{
+        font-size: 1rem;
+        color: var(--main-color);
     }
 }
 
