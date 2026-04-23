@@ -1,12 +1,37 @@
 const overallAPI = 'https://api.openf1.org/v1/championship_drivers?';
 const driversApi = 'https://api.openf1.org/v1/drivers?';
 
-
 const d = document;
 const favSections = d.getElementById('favSection');
 const btnToHome = d.getElementById('toHome');
 const storedFavourites = localStorage.getItem('driversFavoritos');
 const favourites = storedFavourites ? JSON.parse(storedFavourites) :  [];
+const drivers = [];
+
+class driver {
+    name = ''
+    #number = 0
+    scuderias = []
+    country = ''
+    races = []
+    picture = ''
+    
+    constructor(name, scuderias = [], country, meetingKeys = [], picture){
+        this.name = name;
+        this.scuderias = scuderias;
+        this.country = country;
+        this.races = meetingKeys;
+        this.picture = picture;
+    }
+    
+    set setNum(num){
+        this.#number = num;
+    }
+    
+    get getNum(){
+        return this.#number;
+    }
+}
 
 async function fetchData(urlApi){
     const response = await fetch(urlApi);
@@ -28,18 +53,58 @@ const callFavourites = async() =>{
         try{
             const driversInfo = await fetchData(favsApi);
             while(founds.length < favourites.length){
-                if(inArray(founds, driversInfo[i]['last_name'])){
+
+                let currentDriver =  driversInfo[i];
+
+                if(inArray(founds, currentDriver.last_name)){
+                    let drIndex = drivers.findIndex(d => d.name === currentDriver.last_name);
+                    if(!inArray(drivers[drIndex].races, currentDriver.meeting_key)){
+                        drivers[drIndex].races.push(currentDriver.meeting_key)
+                    }
                     i++;
                 } else{
-                    founds.push(driversInfo[i]['last_name']);
-                    let p = d.createElement('p');
-                    p.style = 'color: white;'
-                    p.textContent = `${driversInfo[i]['last_name']} --> ${driversInfo[i]['country_code']}` ;
-                    console.log(driversInfo[0])
-                    favSections.appendChild(p);
-                    i++;
+                    founds.push(currentDriver.last_name);
+
+                    let dr = new driver;
+                    dr.name = currentDriver.last_name;
+                    dr.setNum = currentDriver.driver_number;
+
+                    let team = currentDriver.team_name.toLowerCase();
+
+                    if(!inArray(dr.scuderias, team)){
+                        dr.scuderias.push(team);  
+                    } 
+                    dr.picture = currentDriver.headshot_url;
+                    drivers.push(dr);
+                    
+                    let div = d.createElement('div');
+                    div.classList.add('card');
+
+                    let header = d.createElement('h2');
+                    header.innerHTML = dr.name;
+                    let figure = d.createElement('figure');
+                    let img = d.createElement('img');
+                    img.src= dr.picture;
+
+                    let fav = d.createElement('button');
+                    fav.classList = 'fav';
+                    fav.id = `fav${dr.name}`;
+                    fav.innerHTML = defineStyle(dr.name);
+                        
+                    fav.addEventListener('click', () =>{
+                            gestionarFavoritos(dr.name)
+                        });
+
+
+                    figure.appendChild(img);
+                    div.appendChild(fav);
+                    div.appendChild(header);
+                    div.appendChild(figure);
+                    favSections.appendChild(div);
+                    i++;     
                 }
             }
+            console.log(drivers);
             
 
         } catch(error){

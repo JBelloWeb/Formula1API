@@ -4,9 +4,8 @@
 }
 
 :root{
-    --main-color: #ffffff;
+    --main-color: #e4a63a;
     --secondary-color: #111111;
-    --logo-url: url(media/logo-ferrari.png);
 }
 
 *{
@@ -98,7 +97,7 @@ h1{
     }
 }
 
-.container{
+.container, #favSection{
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
