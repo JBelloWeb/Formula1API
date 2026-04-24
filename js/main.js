@@ -11,6 +11,7 @@ const favourites = storedFavourites ? JSON.parse(storedFavourites) :  [];
 const year = d.getElementById('yearSelector');
 const race = d.getElementById('raceSelector');
 const btnToFavs = d.getElementById('toFavs');
+const loader = d.querySelector('.loader');
 
 class driver {
     name = ''
@@ -68,6 +69,8 @@ const getChampionshipInfo = async() =>{
     }
     drivers.splice(0, drivers.length);
     scuderias.splice(0, scuderias.length);
+
+    loader.classList.remove('d-none');
 
     try{
         const key = await getSessionKey();
@@ -140,6 +143,7 @@ const instanciarDrivers = (scuderia) =>{
             c.remove();
     }
 
+
     for(let dr of drivers){
                let div = d.createElement('div');
                div.id = dr.getNum;
@@ -187,6 +191,8 @@ const instanciarDrivers = (scuderia) =>{
                    list.appendChild(li2);
                    div.appendChild(list);
             })
+
+            loader.classList.add('d-none');
 
             figure.appendChild(img);
             div.appendChild(fav);

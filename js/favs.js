@@ -7,6 +7,7 @@ const btnToHome = d.getElementById('toHome');
 const storedFavourites = localStorage.getItem('driversFavoritos');
 const favourites = storedFavourites ? JSON.parse(storedFavourites) :  [];
 const drivers = [];
+const loader = d.querySelector('.loader')
 
 class driver {
     name = ''
@@ -41,6 +42,9 @@ async function fetchData(urlApi){
 
 const callFavourites = async() =>{
     let favsApi = driversApi;
+
+     loader.classList.remove('d-none');
+
     
     if(favourites.length > 0){
         for(let f of favourites){
@@ -78,7 +82,7 @@ const callFavourites = async() =>{
                     drivers.push(dr);
                     
                     let div = d.createElement('div');
-                    div.classList.add('card');
+                    div.classList='card-fav';
 
                     let header = d.createElement('h2');
                     header.innerHTML = dr.name;
@@ -93,8 +97,7 @@ const callFavourites = async() =>{
                         
                     fav.addEventListener('click', () =>{
                             gestionarFavoritos(dr.name)
-                        });
-
+                    });
 
                     figure.appendChild(img);
                     div.appendChild(fav);
@@ -105,6 +108,8 @@ const callFavourites = async() =>{
                 }
             }
             console.log(drivers);
+            loader.classList.add('d-none');
+
             
 
         } catch(error){

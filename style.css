@@ -18,6 +18,33 @@ body{
     background-color: #111111;    
 }
 
+.d-none{
+    display: none;
+}
+
+.loader {
+  margin: auto;
+  margin-top: 100px;
+  height: 80px;
+  aspect-ratio: 1;
+  padding: 10px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  position: relative;
+  mask: conic-gradient(#000 0 0) content-box exclude,conic-gradient(#000 0 0);
+  filter: blur(12px);
+}
+.loader:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-conic-gradient(#0000 0 5%,#C02942,#0000 20% 50%);
+  animation: l2 1.5s linear infinite;
+}
+@keyframes l2 {
+  to {rotate: 1turn}
+}
+
 h1{
     text-align: center;
     padding: 2rem 0;
@@ -217,20 +244,114 @@ h1{
     }
 }
 
+.card li{
+    color: var(--main-color);
+    list-style: none;
+}
+
+.card-fav{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 45%;
+    height: 250px;
+    padding: 1rem 0;
+    border-radius: 10px;
+    gap: 2rem;
+    box-shadow: var(--main-color) 0px 0px 10px 5px;
+    background-color: var(--secondary-color);
+    outline: 5px solid var(--main-color);
+    color: var(--secondary-color);
+    transform-style: preserve-3d;
+}
+
+.card-fav::before{
+    content: '';
+    position:absolute;
+    aspect-ratio: 1/1;
+    width: 50px;
+    border-radius: 25px;
+    background-color: #111111;
+    top: -25px;
+    right: -25px;
+    outline: 5px solid var(--main-color);
+    outline-offset: -1px;
+    box-shadow: var(--main-color) 0px 0px 10px 5px;
+
+}
+
+.card-fav::after{
+    z-index: -1;
+    transform: translateZ(-1px);
+    position: absolute;
+    content: '';
+    bottom: 50px;
+    top: 50px;
+    left: 50px;
+    right: 50px;
+    border-radius: 40%;
+    filter: blur(10px);
+    background-color: var(--main-color);
+    margin: 0px;
+    opacity: 1;
+    transform-origin: center;
+    animation: glow-up 2s ease forwards;
+}
+.card-fav figure{
+    position:absolute;
+    aspect-ratio: 1/1;
+    width: 40px;
+    border-radius: 25px;
+    top: -20px;
+    right: -20px;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+
+    img{
+        width: 100%;
+    }
+}
+
+.card-fav h2{
+    box-shadow: #111111 0px 4px 20px;
+    background-color: var(--main-color);
+    color: var(--secondary-color);
+    width: 100%;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+.card-fav button{
+    background-color: hsl(from var(--main-color) h s 50%);
+    color: var(--secondary-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+
+    &:hover{
+            box-shadow: var(--main-color) 0px 0px 5px 1px;
+            filter: brightness(110%);
+    }
+}
+
 button.fav{
     border: var(--main-color) 2px solid;
     background-color: transparent;
     padding: 0.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    aspect-ratio: 1/1;
     i{
         font-size: 1rem;
         color: var(--main-color);
     }
 }
 
-.card li{
-    color: var(--main-color);
-    list-style: none;
-}
 
 .hide{
     display: none;
