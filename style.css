@@ -6,16 +6,21 @@
 :root{
     --main-color: #e4a63a;
     --secondary-color: #111111;
+    --main-red: rgb(213, 15, 15);
 }
 
 *{
     margin: 0;
-padding: 0;
+    padding: 0;
 }
 
 body{
     font-family: f1_font, sans-serif;
     background-color: #111111;    
+}
+
+button{
+    font-family: inherit;
 }
 
 .d-none{
@@ -38,18 +43,24 @@ body{
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-conic-gradient(#0000 0 5%,#C02942,#0000 20% 50%);
+  background: repeating-conic-gradient(#0000 0 5%,var(--main-red),#0000 20% 50%);
   animation: l2 1.5s linear infinite;
 }
 @keyframes l2 {
   to {rotate: 1turn}
 }
 
+#toFavs, #toHome{
+    padding: 0.4rem;
+    aspect-ratio: 1/1;
+    border-radius: 20px;
+}
+
 h1{
     text-align: center;
     padding: 2rem 0;
     color: white;
-    background-color: rgb(213, 15, 15);
+    background-color: var(--main-red);
 }
 
 .sticky-top{
@@ -65,7 +76,7 @@ h1{
     gap: 2rem;
 
     width: 100%;
-    background-color: rgb(213, 15, 15);
+    background-color: var(--main-red);
 }
 
 .teams{
@@ -351,7 +362,6 @@ button.fav{
         color: var(--main-color);
     }
 }
-
 
 .hide{
     display: none;
