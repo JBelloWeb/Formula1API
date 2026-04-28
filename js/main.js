@@ -200,7 +200,7 @@ const instanciarDrivers = (scuderia) =>{
                button.innerHTML = 'Ver info';
                button.addEventListener('click', async () => {
                     button.disabled = true;
-                    if(!(button.classList.contains('diabled'))){
+                    if(!(button.classList.contains('disabled'))){
                     button.classList.add('disabled');
                     let cardLoader = d.createElement('div');
                         cardLoader.className = 'card-loader';
@@ -229,9 +229,10 @@ const instanciarDrivers = (scuderia) =>{
                             button.remove();
 
                             div.appendChild(list);
+
                         } catch (error) {
                             console.error("Error obteniendo la información", error);
-                            cardLoader.innerHTML = 'Error al cargar info. Reintenta.';
+                            feedbackManager(errorReporter, true);
                             button.disabled = false;
                         }
             }})
