@@ -12,6 +12,8 @@ const year = d.getElementById('yearSelector');
 const race = d.getElementById('raceSelector');
 const btnToFavs = d.getElementById('toFavs');
 const loader = d.querySelector('.loader');
+const errorReporter = d.getElementById('noConection');
+const btnRetry = d.getElementById('btnRetry');
 
 class driver {
     name = ''
@@ -38,8 +40,29 @@ class driver {
     }
 }
 
+const feedbackManager = (target, turnOn) => {
+    switch (turnOn){
+        case true:
+            if(target.classList.contains('d-none')) target.classList.remove('d-none');
+            break;
+
+        case false:
+            if(!(target.classList.contains('d-none'))) target.classList.add('d-none');
+            break;
+        
+        default:
+            break;
+    }
+}
+
 async function fetchData(urlApi){
     const response = await fetch(urlApi);
+    
+    if(response.status === 429){
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        return fetchData(urlApi);
+    }
+    
     const data = await response.json();
     return data;
 }
@@ -52,6 +75,8 @@ const getSessionKey = async () =>{
         return key;   
     }catch(error){
         console.error(error);
+        feedbackManager(loader, false);
+        feedbackManager(errorReporter, true);
 }}
 
 const getChampionshipInfo = async() =>{
@@ -70,7 +95,8 @@ const getChampionshipInfo = async() =>{
     drivers.splice(0, drivers.length);
     scuderias.splice(0, scuderias.length);
 
-    loader.classList.remove('d-none');
+    feedbackManager(loader, true);
+
 
     try{
         const key = await getSessionKey();
@@ -104,13 +130,15 @@ const getChampionshipInfo = async() =>{
             dr.picture = n.headshot_url;
             let is = scuderias.includes(team.toUpperCase());
             
-            !is ? scuderias.push(team.toUpperCase()) : console.log(`${n.team_name} ya está registrado`);
+            if(!is) scuderias.push(team.toUpperCase());
             drivers.push(dr);
         }
         instanciarDrivers();
         instanciarScuderias();
     } catch(error){
         console.error(error);
+        feedbackManager(loader, false);
+        feedbackManager(errorReporter, true);
     }
     
 }
@@ -171,28 +199,44 @@ const instanciarDrivers = (scuderia) =>{
                button.classList = 'info';
                button.innerHTML = 'Ver info';
                button.addEventListener('click', async () => {
-               let list = d.createElement('ul');
-               let li1 = d.createElement('li');
-               const points = await getInfo(dr.getNum, 'points_current');
-               console.log(points);
-               switch(points){
-                   case "null":
-                       points = '0';
-                       break;
-                   default:
-                       break;
-               }
-               li1.innerHTML = `Puntos: ${points}`;
-               let li2 = d.createElement('li');
-                   const pos = await getInfo(dr.getNum, 'position_current');
-                   li2.innerHTML = `Posición en tabla: ${pos}`;
+                    button.disabled = true;
+                    if(!(button.classList.contains('diabled'))){
+                    button.classList.add('disabled');
+                    let cardLoader = d.createElement('div');
+                        cardLoader.className = 'card-loader';
+                        cardLoader.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                        div.appendChild(cardLoader);
 
-                   list.appendChild(li1);
-                   list.appendChild(li2);
-                   div.appendChild(list);
-            })
+                        try{
+                            let list = d.createElement('ul');
+                       
+                            let li1 = d.createElement('li');
+                            let points = await getInfo(dr.getNum, 'points_current');
 
-            loader.classList.add('d-none');
+                            if (points === "null" || points === null) {
+                                points = '0';
+                            }
+                            li1.innerHTML = `Puntos: ${points}`;
+                            
+                            let li2 = d.createElement('li');
+                            const pos = await getInfo(dr.getNum, 'position_current');
+                            li2.innerHTML = `Posición en tabla: ${pos}`;
+
+                            list.appendChild(li1);
+                            list.appendChild(li2);
+
+                            cardLoader.remove();
+                            button.remove();
+
+                            div.appendChild(list);
+                        } catch (error) {
+                            console.error("Error obteniendo la información", error);
+                            cardLoader.innerHTML = 'Error al cargar info. Reintenta.';
+                            button.disabled = false;
+                        }
+            }})
+
+            feedbackManager(loader, false)
 
             figure.appendChild(img);
             div.appendChild(fav);
@@ -242,14 +286,36 @@ const getInfo = async (num, mod) =>{
         return data[0][mod];
     }catch(error){
         console.error(error);
+        feedbackManager(loader, false);
+        feedbackManager(errorReporter, true);
         return 'Error';
     }
 }
 race.addEventListener('change', ()=>{
     instanciarDrivers();
+    let options = year.querySelectorAll('option');
+    if(!(race.value == 'China' || race.value == 'Australia' || race.value == 'Japan')){
+        options.forEach(y =>{
+            if(y.value == '2026') y.disabled = true;
+        })
+    } else{
+        options.forEach(o => {
+            o.disabled = false;
+        });
+    }
 })
 
 year.addEventListener('change', () =>{
+    let options = race.querySelectorAll('option');
+    if(year.value == '2026'){
+        options.forEach(o => {
+            if(!(o.value == 'China' || o.value == 'Australia' || o.value == 'Japan')) o.disabled = true;
+        });
+    }else{
+        options.forEach(o => {
+            o.disabled = false;
+        });
+    }
     getChampionshipInfo();
 })
 
@@ -257,3 +323,6 @@ btnToFavs.addEventListener('click', () =>{
 window.location.href = 'pages/favourites.html';
 });
 
+btnRetry.addEventListener('click', () =>{
+    window.location.reload();
+})

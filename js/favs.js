@@ -1,6 +1,30 @@
 const overallAPI = 'https://api.openf1.org/v1/championship_drivers?';
 const driversApi = 'https://api.openf1.org/v1/drivers?';
 
+const flagApi = "https://flagcdn.com/16x12/";
+
+const flagCode = {
+    'ARG': 'ar',
+    'ESP': 'es',
+    'NED': 'nl',
+    'FRA': 'fr',
+    'USA': 'us',
+    'GBR': 'gb_eng',
+    'MEX': 'mx',
+    'MON': 'mc',
+    'DEN': 'dk',
+    'JPN': 'jp',
+    'CHN': 'cn',
+    'GER': 'de',
+    'AUS': 'au',
+    'THA': 'th',
+    'CAN': 'ca',
+    'FIN': 'fi',
+    'ITA': 'it',
+    'NZL': 'nz',
+    'BRA': 'br'
+};
+
 const d = document;
 const favSections = d.getElementById('favSection');
 const btnToHome = d.getElementById('toHome');
@@ -8,6 +32,8 @@ const storedFavourites = localStorage.getItem('driversFavoritos');
 const favourites = storedFavourites ? JSON.parse(storedFavourites) :  [];
 const drivers = [];
 const loader = d.querySelector('.loader')
+const btnRedirect = d.getElementById('btnRedirect');
+const errorReporter = d.getElementById('listaVacia');
 
 class driver {
     name = ''
@@ -34,6 +60,22 @@ class driver {
     }
 }
 
+
+const feedbackManager = (target, turnOn) => {
+    switch (turnOn){
+        case true:
+            if(target.classList.contains('d-none')) target.classList.remove('d-none');
+            break;
+
+        case false:
+            if(!(target.classList.contains('d-none'))) target.classList.add('d-none');
+            break;
+        
+        default:
+            break;
+    }
+}
+
 async function fetchData(urlApi){
     const response = await fetch(urlApi);
     const data = await response.json();
@@ -42,81 +84,101 @@ async function fetchData(urlApi){
 
 const callFavourites = async() =>{
     let favsApi = driversApi;
+    feedbackManager(loader, true);
 
-     loader.classList.remove('d-none');
-
-    
     if(favourites.length > 0){
         for(let f of favourites){
             favsApi += `last_name=${f}&`;
         }
-        
-        let founds = [];
-        let i = 0;
 
         try{
             const driversInfo = await fetchData(favsApi);
-            while(founds.length < favourites.length){
+            const groupedDrivers = {};
 
-                let currentDriver =  driversInfo[i];
+            for(let info of driversInfo){
+                let name = info.last_name;
+                let team = info.team_name.toLowerCase();
+                let race = info.meeting_key;
 
-                if(inArray(founds, currentDriver.last_name)){
-                    let drIndex = drivers.findIndex(d => d.name === currentDriver.last_name);
-                    if(!inArray(drivers[drIndex].races, currentDriver.meeting_key)){
-                        drivers[drIndex].races.push(currentDriver.meeting_key)
+                if(!groupedDrivers[name]) {
+                    groupedDrivers[name] = new driver(
+                        name,
+                        [team],
+                        info.country_code,
+                        [race],
+                        info.headshot_url
+                    );
+                    groupedDrivers[name].setNum = info.driver_number;
+                }else{
+                    if (!groupedDrivers[name].scuderias.includes(team)) {
+                        groupedDrivers[name].scuderias.push(team);
                     }
-                    i++;
-                } else{
-                    founds.push(currentDriver.last_name);
-
-                    let dr = new driver;
-                    dr.name = currentDriver.last_name;
-                    dr.setNum = currentDriver.driver_number;
-
-                    let team = currentDriver.team_name.toLowerCase();
-
-                    if(!inArray(dr.scuderias, team)){
-                        dr.scuderias.push(team);  
-                    } 
-                    dr.picture = currentDriver.headshot_url;
-                    drivers.push(dr);
-                    
-                    let div = d.createElement('div');
-                    div.classList='card-fav';
-
-                    let header = d.createElement('h2');
-                    header.innerHTML = dr.name;
-                    let figure = d.createElement('figure');
-                    let img = d.createElement('img');
-                    img.src= dr.picture;
-
-                    let fav = d.createElement('button');
-                    fav.classList = 'fav';
-                    fav.id = `fav${dr.name}`;
-                    fav.innerHTML = defineStyle(dr.name);
-                        
-                    fav.addEventListener('click', () =>{
-                            gestionarFavoritos(dr.name)
-                    });
-
-                    figure.appendChild(img);
-                    div.appendChild(fav);
-                    div.appendChild(header);
-                    div.appendChild(figure);
-                    favSections.appendChild(div);
-                    i++;     
+                    if (!groupedDrivers[name].races.includes(race)) {
+                        groupedDrivers[name].races.push(race);
+                    }
                 }
             }
-            console.log(drivers);
-            loader.classList.add('d-none');
 
-            
+            drivers.push(...Object.values(groupedDrivers));
 
+
+
+            for (let dr of Object.values(groupedDrivers)) {
+                let div = d.createElement('div');
+                div.classList='card-fav';
+
+                let header = d.createElement('h2');
+                header.innerHTML = dr.name;
+                
+                let figure = d.createElement('figure');
+                let img = d.createElement('img');
+                img.src = dr.picture ? dr.picture : 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers';
+                figure.appendChild(img);
+
+                let fav = d.createElement('button');
+                fav.classList = 'fav';
+                fav.id = `fav${dr.name}`;
+                fav.innerHTML = defineStyle(dr.name);
+                fav.addEventListener('click', () => gestionarFavoritos(dr.name));
+
+                let pais = d.createElement('div');
+                pais.id = `country${dr.name}`;
+                pais.classList = 'country-tag';
+                
+                let nameCountry = d.createElement('h3');
+                let flag = d.createElement('img');
+                nameCountry.innerHTML = dr.country ? dr.country : (dr.name === 'Bortoleto' ? 'BRA' : 'No Registry');
+                flag.src = `https://flagcdn.com/16x12/${flagCode[dr.country] ? flagCode[dr.country] : (dr.name === 'Bortoleto' ? 'br' : 'un')}.png`;
+                
+                pais.appendChild(nameCountry);
+                pais.appendChild(flag);
+
+                let history = d.createElement('p');
+                history.id = `history${dr.name}`;
+                history.innerHTML = `Equipos: ${dr.scuderias.join(',  ')}`; 
+
+                let carreras = d.createElement('h3');
+                carreras.id = `races${dr.name}`; 
+                carreras.textContent = `Carreras -> ${dr.races.length}`;
+
+                div.appendChild(fav);
+                div.appendChild(header);
+                div.appendChild(figure);
+                div.appendChild(pais);
+                div.appendChild(history);
+                div.appendChild(carreras);
+                
+                favSections.appendChild(div);
+            }
         } catch(error){
             console.log(error);
         }
     }
-
+    else{
+        feedbackManager(errorReporter, true);
+    }
+    
+    feedbackManager(loader, false);
 }
 callFavourites();
 
@@ -131,7 +193,7 @@ const defineStyle = (name) =>{
 
 const gestionarFavoritos = (nombre) =>{
     let favs = JSON.parse(localStorage.getItem('driversFavoritos')) || [];
-    inArray(favs, nombre) ? favs.splice(i => {favs.indexOf(nombre)}, 1) : favs.push(nombre);
+    inArray(favs, nombre) ? favs.splice(favs.indexOf(nombre), 1) : favs.push(nombre);
 
     localStorage.setItem('driversFavoritos', JSON.stringify(favs));
 
@@ -150,6 +212,13 @@ const gestionarFavoritos = (nombre) =>{
 //     for(let f of favourites)
 // }
 
-btnToHome.addEventListener('click', () =>{
+function Redirect() {
     window.location.href = '../index.html';
+}
+
+btnToHome.addEventListener('click', () =>{
+    Redirect()
+});
+btnRedirect.addEventListener('click', () =>{
+    Redirect()
 });

@@ -7,6 +7,8 @@
     --main-color: #e4a63a;
     --secondary-color: #111111;
     --main-red: rgb(213, 15, 15);
+    --main-white: #fefefe;    
+    --main-gray: #ffffff9c;    
 }
 
 *{
@@ -24,7 +26,7 @@ button{
 }
 
 .d-none{
-    display: none;
+    display: none !important;
 }
 
 .loader {
@@ -46,6 +48,27 @@ button{
   background: repeating-conic-gradient(#0000 0 5%,var(--main-red),#0000 20% 50%);
   animation: l2 1.5s linear infinite;
 }
+
+.card-loader{
+    position: relative;
+    margin: auto;
+    height: 30px;
+    aspect-ratio: 1;
+    padding: 10px;
+    mask: conic-gradient(#000 0 0) content-box exclude,conic-gradient(#000 0 0);
+    filter: blur(7px);
+    border-radius: 50%;
+
+
+    &::before{
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-conic-gradient(#0000 0 5%,var(--main-color),#0000 20% 50%);
+        animation: l2 1.5s linear infinite;
+    }
+}
+
 @keyframes l2 {
   to {rotate: 1turn}
 }
@@ -73,6 +96,7 @@ h1{
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 2rem;
 
     width: 100%;
@@ -140,7 +164,7 @@ h1{
     justify-content: center;
     flex-wrap: wrap;
     margin: 125px auto;
-    padding: 0 10rem;
+    padding: 0;
     gap: 3rem;
 }
 
@@ -150,9 +174,8 @@ h1{
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: auto;
-    width: 15rem;
-    height: 200px;
+    width: 75%;
+    aspect-ratio: 1 / 1;
     padding: 1rem 0;
     border-radius: 10px;
     gap: 2rem;
@@ -268,6 +291,7 @@ h1{
     align-items: center;
     margin: auto;
     width: 45%;
+    min-height: fit-content;
     height: 250px;
     padding: 1rem 0;
     border-radius: 10px;
@@ -277,6 +301,10 @@ h1{
     outline: 5px solid var(--main-color);
     color: var(--secondary-color);
     transform-style: preserve-3d;
+
+    h3, p{
+        color: var(--main-white);
+    }
 }
 
 .card-fav::before{
@@ -350,6 +378,13 @@ h1{
     }
 }
 
+.country-tag{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px
+}
+
 button.fav{
     border: var(--main-color) 2px solid;
     background-color: transparent;
@@ -363,10 +398,103 @@ button.fav{
     }
 }
 
+#listaVacia, #noConection{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+    color: var(--main-white);
+
+    h2{
+        color: var(--main-red);
+        font-size: 2rem;
+        margin: 0;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+.alert{
+    outline: 4px solid var(--main-gray);
+    color: var(--main-gray);
+    border-radius: 25px;        
+    width: 50px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+}
+
+.buttonazo{
+    padding: 0.7rem 1rem;
+    background: transparent;
+    border: 2px solid var(--main-color);
+    color: var(--main-color);
+
+    &::before{
+        content: '';
+        position: relative;
+        left: -2rem;
+        background-color: var(--main-color);
+        padding: 0.7rem 0.2rem;
+
+        animation: idle 1s linear alternate infinite;
+    }
+
+    &::after{
+        content: '';
+        position: relative;
+        right: -2rem;
+        background-color: var(--main-color);
+        padding: 0.7rem 0.2rem;
+
+        animation: idle 1s linear alternate infinite;
+    }
+
+    &:hover{
+        cursor: pointer;
+        background-color: var(--main-color);
+        color: var(--secondary-color);
+
+        &::after, &::before{
+            animation: rotate 0.25s ease forwards;
+        }
+    }
+}   
+
+@keyframes idle{
+    from{
+        padding: 0rem 0.2rem;
+    }
+
+    to{
+        padding: 0.7rem 0.2rem;
+    }
+}
+
+@keyframes rotate {
+    to{
+        padding: 0.2rem 0.2rem;
+        border-radius: 25px;
+    }
+}
+
 .hide{
     display: none;
 }
 
+.card .disabled{
+    background-color: transparent;
+    outline: 2px solid var(--main-color);
+    color: var(--main-color);
+
+    &:hover{
+        cursor: not-allowed;
+    }
+}
 
 .flip{
     animation: flip 0.5s ease-in-out forwards;
@@ -392,4 +520,28 @@ button.fav{
         display: none;
     }
     
+}
+
+@media (min-width: 520px){
+    .container, #favSection{
+    padding: 0 2rem;
+    gap: 5rem;
+}
+
+.card{
+    width: 15rem;
+    padding: 1rem 0;
+}
+}
+
+@media (min-width: 1000px){
+    .container, #favSection{
+    padding: 0 15rem;
+    gap: 5rem;
+}
+
+.card{
+    width: 15rem;
+    padding: 1rem 0;
+}
 }
