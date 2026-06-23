@@ -34,6 +34,7 @@ const drivers = [];
 const loader = d.querySelector('.loader')
 const btnRedirect = d.getElementById('btnRedirect');
 const errorReporter = d.getElementById('listaVacia');
+const LS_FAVS_KEY = 'favsData';
 
 class driver {
     name = ''
@@ -82,6 +83,141 @@ async function fetchData(urlApi){
     return data;
 }
 
+/**
+ * Guarda los datos detallados de favoritos en localStorage.
+ * Incluye un "snapshot" de la lista actual de favoritos para detectar
+ * cambios en futuras cargas. Si el usuario agrega o quita un favorito
+ * sin conexión, el snapshot quedará desactualizado y en la próxima
+ * carga se detectará el cambio, forzando un refresh desde la API.
+ * 
+ * @param {Object} groupedDrivers - Objeto con key=nombre, value=driver
+ */
+const saveFavsToLocalStorage = (groupedDrivers) => {
+    const data = {
+        snapshot: [...favourites],
+        drivers: {}
+    };
+    for (const [name, dr] of Object.entries(groupedDrivers)) {
+        data.drivers[name] = {
+            name: dr.name,
+            number: dr.getNum,
+            scuderias: dr.scuderias,
+            country: dr.country,
+            races: dr.races,
+            picture: dr.picture
+        };
+    }
+    localStorage.setItem(LS_FAVS_KEY, JSON.stringify(data));
+};
+
+/**
+ * Carga los datos de favoritos desde localStorage y detecta si hubo
+ * cambios en la lista desde la última vez que se guardó.
+ * 
+ * Flujo:
+ * 1. Si no hay datos guardados → retorna null (cache miss)
+ * 2. Compara el snapshot guardado con la lista actual de favoritos
+ * 3. Filtra solo los drivers que siguen siendo favoritos
+ * 4. Retorna los drivers reconstruidos + flag de cambio
+ * 
+ * @returns {Object|null} { drivers: Object, changed: boolean } o null
+ */
+const loadFavsFromLocalStorage = () => {
+    const stored = localStorage.getItem(LS_FAVS_KEY);
+    if (!stored) return null;
+
+    const data = JSON.parse(stored);
+    const snapshot = data.snapshot || [];
+
+    const changed = snapshot.length !== favourites.length ||
+                    !snapshot.every(f => favourites.includes(f));
+
+    const groupedDrivers = {};
+    for (const [name, d] of Object.entries(data.drivers)) {
+        if (favourites.includes(name)) {
+            const dr = new driver();
+            dr.name = d.name;
+            dr.setNum = d.number;
+            dr.scuderias = d.scuderias;
+            dr.country = d.country;
+            dr.races = d.races;
+            dr.picture = d.picture;
+            groupedDrivers[name] = dr;
+        }
+    }
+
+    return { drivers: groupedDrivers, changed };
+};
+
+/**
+ * Renderiza las cards de favoritos en el DOM.
+ * Limpia el contenedor antes de dibujar y maneja el estado vacío.
+ * Se usa tanto para datos frescos de la API como para datos de cache.
+ * 
+ * @param {Object} groupedDrivers - Objeto con key=nombre, value=driver
+ */
+const renderFavs = (groupedDrivers) => {
+    favSections.innerHTML = '';
+    feedbackManager(errorReporter, false);
+
+    const entries = Object.values(groupedDrivers);
+    if (entries.length === 0) {
+        feedbackManager(errorReporter, true);
+        feedbackManager(loader, false);
+        return;
+    }
+
+    for (let dr of entries) {
+        let div = d.createElement('div');
+        div.classList='card-fav';
+
+        let header = d.createElement('h2');
+        header.innerHTML = dr.name;
+        
+        let figure = d.createElement('figure');
+        let img = d.createElement('img');
+        img.src = dr.picture ? dr.picture : 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers';
+        figure.appendChild(img);
+
+        let fav = d.createElement('button');
+        fav.classList = 'fav';
+        fav.id = `fav${dr.name}`;
+        fav.innerHTML = defineStyle(dr.name);
+        fav.addEventListener('click', () => gestionarFavoritos(dr.name));
+
+        let pais = d.createElement('div');
+        pais.id = `country${dr.name}`;
+        pais.classList = 'country-tag';
+        
+        let nameCountry = d.createElement('h3');
+        let flag = d.createElement('img');
+        nameCountry.innerHTML = dr.country ? dr.country : (dr.name === 'Bortoleto' ? 'BRA' : 'No Registry');
+        flag.src = `https://flagcdn.com/16x12/${flagCode[dr.country] ? flagCode[dr.country] : (dr.name === 'Bortoleto' ? 'br' : 'un')}.png`;
+        
+        pais.appendChild(nameCountry);
+        pais.appendChild(flag);
+
+        let history = d.createElement('p');
+        history.id = `history${dr.name}`;
+        history.innerHTML = `Equipos: ${dr.scuderias.join(',  ')}`; 
+
+        let carreras = d.createElement('h3');
+        carreras.id = `races${dr.name}`; 
+        carreras.textContent = `Carreras -> ${dr.races.length}`;
+
+        div.appendChild(fav);
+        div.appendChild(header);
+        div.appendChild(figure);
+        div.appendChild(pais);
+        div.appendChild(history);
+        div.appendChild(carreras);
+        
+        favSections.appendChild(div);
+    }
+
+    feedbackManager(loader, false);
+};
+
 const callFavourites = async() =>{
     let favsApi = driversApi;
     feedbackManager(loader, true);
@@ -121,55 +257,8 @@ const callFavourites = async() =>{
 
             drivers.push(...Object.values(groupedDrivers));
 
-
-
-            for (let dr of Object.values(groupedDrivers)) {
-                let div = d.createElement('div');
-                div.classList='card-fav';
-
-                let header = d.createElement('h2');
-                header.innerHTML = dr.name;
-                
-                let figure = d.createElement('figure');
-                let img = d.createElement('img');
-                img.src = dr.picture ? dr.picture : 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers';
-                figure.appendChild(img);
-
-                let fav = d.createElement('button');
-                fav.classList = 'fav';
-                fav.id = `fav${dr.name}`;
-                fav.innerHTML = defineStyle(dr.name);
-                fav.addEventListener('click', () => gestionarFavoritos(dr.name));
-
-                let pais = d.createElement('div');
-                pais.id = `country${dr.name}`;
-                pais.classList = 'country-tag';
-                
-                let nameCountry = d.createElement('h3');
-                let flag = d.createElement('img');
-                nameCountry.innerHTML = dr.country ? dr.country : (dr.name === 'Bortoleto' ? 'BRA' : 'No Registry');
-                flag.src = `https://flagcdn.com/16x12/${flagCode[dr.country] ? flagCode[dr.country] : (dr.name === 'Bortoleto' ? 'br' : 'un')}.png`;
-                
-                pais.appendChild(nameCountry);
-                pais.appendChild(flag);
-
-                let history = d.createElement('p');
-                history.id = `history${dr.name}`;
-                history.innerHTML = `Equipos: ${dr.scuderias.join(',  ')}`; 
-
-                let carreras = d.createElement('h3');
-                carreras.id = `races${dr.name}`; 
-                carreras.textContent = `Carreras -> ${dr.races.length}`;
-
-                div.appendChild(fav);
-                div.appendChild(header);
-                div.appendChild(figure);
-                div.appendChild(pais);
-                div.appendChild(history);
-                div.appendChild(carreras);
-                
-                favSections.appendChild(div);
-            }
+            renderFavs(groupedDrivers);
+            saveFavsToLocalStorage(groupedDrivers);
         } catch(error){
             console.log(error);
         }
@@ -180,7 +269,31 @@ const callFavourites = async() =>{
     
     feedbackManager(loader, false);
 }
-callFavourites();
+
+/**
+ * Carga inicial: prioriza cache local sobre fetch a la API.
+ * 
+ * Flujo:
+ * 1. Intenta cargar datos desde localStorage (loadFavsFromLocalStorage)
+ * 2. Si hay cache y NO hubo cambios en la lista de favoritos:
+ *    - Renderiza desde cache, NO hace fetch a la API
+ * 3. Si hay cache pero SÍ hubo cambios:
+ *    - Renderiza desde cache (muestra datos disponibles)
+ *    - Hace fetch en background para obtener datos frescos
+ * 4. Si no hay cache:
+ *    - Hace fetch normal a la API
+ */
+(function init() {
+    const cache = loadFavsFromLocalStorage();
+    if (cache) {
+        renderFavs(cache.drivers);
+        if (cache.changed) {
+            callFavourites();
+        }
+    } else {
+        callFavourites();
+    }
+})();
 
 const inArray = (array, name) =>{
     return array.includes(name);
@@ -196,6 +309,7 @@ const gestionarFavoritos = (nombre) =>{
     inArray(favs, nombre) ? favs.splice(favs.indexOf(nombre), 1) : favs.push(nombre);
 
     localStorage.setItem('driversFavoritos', JSON.stringify(favs));
+    localStorage.removeItem(LS_FAVS_KEY); // invalidar cache de detalles
 
     let target = d.getElementById(`fav${nombre}`);
     if(target) {

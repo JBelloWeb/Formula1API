@@ -40,6 +40,38 @@ class driver {
     }
 }
 
+const saveToLocalStorage = () =>{
+    const data = driver.map(d => ({
+        name: d.name,
+        number: d.getNum,
+        scuderia: d.scuderia,
+        points: d.points,
+        color: d.color,
+        picture: d.picture
+    }));
+
+    localStorage.setItem(LS_DRIVERS_KEY, JSON.stringify({ drivers: Date, scuderias }));
+};
+
+const loadFromLocalStorage = () => {
+    const stored = localStorage.getItem(LS_DRIVERS_KEY);
+    if(!stored) return false;
+    const { drivers: data, scuderias: teams } = JSON.parse(stored);
+    drivers.length = 0;
+    for (const d of data) {
+        const dr = new driver();
+        dr.name = d.name;
+        dr.setNum = d.number;
+        dr.scuderia = d.scuderia;
+        dr.points = d.points;
+        dr.color = d.color;
+        dr.picture = d.picture;
+        drivers.push(dr);
+    }
+    scuderias.push(...teams);
+    return true;
+}
+
 const feedbackManager = (target, turnOn) => {
     switch (turnOn){
         case true:
@@ -142,7 +174,15 @@ const getChampionshipInfo = async() =>{
     }
     
 }
-getChampionshipInfo();
+
+if(!loadFromLocalStorage()) {
+    getChampionshipInfo();
+} else {
+    instanciarDrivers();
+    instanciarScuderias();
+    feedbackManager(loader, false);
+    getChampionshipInfo();
+}
 
 const inArray = (array, name) =>{
     return array.includes(name);
@@ -158,6 +198,7 @@ const gestionarFavoritos = (nombre) =>{
     inArray(favs, nombre) ? favs.splice(i => {favs.indexOf(nombre)}, 1) : favs.push(nombre);
 
     localStorage.setItem('driversFavoritos', JSON.stringify(favs));
+    localStorage.removeItem('favsData'); // invalidar cache de detalles de favoritos
 
     let target = d.getElementById(`fav${nombre}`);
     if(target) {
