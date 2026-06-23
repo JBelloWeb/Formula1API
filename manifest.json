@@ -9,7 +9,7 @@
             "src": "icons/android-icon-36x36.png",
             "sizes": "36x36",
             "type": "image\/png",
-            "desnity": "0.75"
+            "density": "0.75"
         },
         {
             "src": "icons/android-icon-48x48.png",

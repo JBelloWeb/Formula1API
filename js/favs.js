@@ -83,15 +83,6 @@ async function fetchData(urlApi){
     return data;
 }
 
-/**
- * Guarda los datos detallados de favoritos en localStorage.
- * Incluye un "snapshot" de la lista actual de favoritos para detectar
- * cambios en futuras cargas. Si el usuario agrega o quita un favorito
- * sin conexión, el snapshot quedará desactualizado y en la próxima
- * carga se detectará el cambio, forzando un refresh desde la API.
- * 
- * @param {Object} groupedDrivers - Objeto con key=nombre, value=driver
- */
 const saveFavsToLocalStorage = (groupedDrivers) => {
     const data = {
         snapshot: [...favourites],
@@ -110,18 +101,6 @@ const saveFavsToLocalStorage = (groupedDrivers) => {
     localStorage.setItem(LS_FAVS_KEY, JSON.stringify(data));
 };
 
-/**
- * Carga los datos de favoritos desde localStorage y detecta si hubo
- * cambios en la lista desde la última vez que se guardó.
- * 
- * Flujo:
- * 1. Si no hay datos guardados → retorna null (cache miss)
- * 2. Compara el snapshot guardado con la lista actual de favoritos
- * 3. Filtra solo los drivers que siguen siendo favoritos
- * 4. Retorna los drivers reconstruidos + flag de cambio
- * 
- * @returns {Object|null} { drivers: Object, changed: boolean } o null
- */
 const loadFavsFromLocalStorage = () => {
     const stored = localStorage.getItem(LS_FAVS_KEY);
     if (!stored) return null;
@@ -149,13 +128,6 @@ const loadFavsFromLocalStorage = () => {
     return { drivers: groupedDrivers, changed };
 };
 
-/**
- * Renderiza las cards de favoritos en el DOM.
- * Limpia el contenedor antes de dibujar y maneja el estado vacío.
- * Se usa tanto para datos frescos de la API como para datos de cache.
- * 
- * @param {Object} groupedDrivers - Objeto con key=nombre, value=driver
- */
 const renderFavs = (groupedDrivers) => {
     favSections.innerHTML = '';
     feedbackManager(errorReporter, false);

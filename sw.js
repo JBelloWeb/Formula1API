@@ -1,10 +1,11 @@
-let cacheName = 'cache';
-let cacheDynamic = 'cache2';
+let cacheName = 'cache-v2';
+let cacheDynamic = 'cache2-v2';
 let appShell = [
     'index.html',
     'pages/favourites.html',
     'style.css',
     'favicon.ico',
+    'manifest.json',
     'js/main.js',
     'js/favs.js',
     'js/sw-register.js',
@@ -33,29 +34,51 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (e) => {
+    const isApiRequest = e.request.url.includes('api.openf1.org');
+
     if (e.request.mode === 'navigate') {
         e.respondWith(
-            caches.match('index.html')
-                .then((response) => response || fetch(e.request))
+            caches.match(e.request)
+                .then(response => response || fetch(e.request))
         );
         return;
     }
 
-    e.respondWith(
-        caches.match(e.request)
-            .then((response) => {
-                if (response) return response;
+    if (isApiRequest) {
+        e.respondWith(
+            fetch(e.request)
+                .then((response) => {
+                    if (!response || response.status !== 200) return response;
 
-                return fetch(e.request)
-                    .then((response) => {
-                        if (!response || response.status !== 200) return response;
+                    let responseToCache = response.clone();
+                    caches.open(cacheDynamic)
+                        .then((cache) => cache.put(e.request, responseToCache));
 
-                        let responseToCache = response.clone();
-                        caches.open(cacheDynamic)
-                            .then((cache) => cache.put(e.request, responseToCache));
+                    return response;
+                })
+                .catch(() => {
+                    return caches.match(e.request)
+                        .then((response) => response || new Response('Offline', { status: 503 }));
+                })
+        );
+    } else {
+        e.respondWith(
+            caches.match(e.request)
+                .then((response) => {
+                    if (response) return response;
 
-                        return response;
-                    })
-            })
-    );
+                    return fetch(e.request)
+                        .then((response) => {
+                            if (!response || response.status !== 200) return response;
+
+                            let responseToCache = response.clone();
+                            caches.open(cacheDynamic)
+                                .then((cache) => cache.put(e.request, responseToCache));
+
+                            return response;
+                        })
+                        .catch(() => new Response('Offline', { status: 503 }))
+                })
+        );
+    }
 });

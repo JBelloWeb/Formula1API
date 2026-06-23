@@ -23,7 +23,7 @@ if('serviceWorker' in navigator){
 (() => {
     let notice;
 
-    window.addEventListener('beforeInstallprompt', (event) => {
+    window.addEventListener('beforeinstallprompt', (event) => {
         event.preventDefault();
         notice = event;
         console.log(event);
@@ -31,13 +31,15 @@ if('serviceWorker' in navigator){
     });
 
     const showAddToHomeScreen = () => {
-        let showAlert = document.querySelector('#add-alert');
+        let showAlert = document.querySelector('#share');
+        if (!showAlert) return;
         showAlert.classList.remove('d-none');
         showAlert.addEventListener('click', addToHomeScreen);
     };
 
     const addToHomeScreen = () =>{
-        let showAlert = document.querySelector('#add-alert');
+        let showAlert = document.querySelector('#share');
+        if (!showAlert) return;
         showAlert.classList.add('d-none');
 
         if(notice){
@@ -57,7 +59,9 @@ if('serviceWorker' in navigator){
 })();
 
 (()=>{
-    document.querySelector('#share').addEventListener('click', () => {
+    const shareBtn = document.querySelector('#share');
+    if (!shareBtn) return;
+    shareBtn.addEventListener('click', () => {
         if(navigator.share){
             navigator.share({
                 title: 'Formula 1 - PWA',

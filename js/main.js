@@ -15,6 +15,8 @@ const loader = d.querySelector('.loader');
 const errorReporter = d.getElementById('noConection');
 const btnRetry = d.getElementById('btnRetry');
 
+const LS_DRIVERS_KEY = 'driversData';
+
 class driver {
     name = ''
     #number = 0
@@ -41,7 +43,7 @@ class driver {
 }
 
 const saveToLocalStorage = () =>{
-    const data = driver.map(d => ({
+    const data = drivers.map(d => ({
         name: d.name,
         number: d.getNum,
         scuderia: d.scuderia,
@@ -50,7 +52,7 @@ const saveToLocalStorage = () =>{
         picture: d.picture
     }));
 
-    localStorage.setItem(LS_DRIVERS_KEY, JSON.stringify({ drivers: Date, scuderias }));
+    localStorage.setItem(LS_DRIVERS_KEY, JSON.stringify({ drivers: data, scuderias }));
 };
 
 const loadFromLocalStorage = () => {
@@ -367,4 +369,20 @@ window.location.href = 'pages/favourites.html';
 
 btnRetry.addEventListener('click', () =>{
     window.location.reload();
-})
+});
+
+const alertEl = document.getElementById('add-alert');
+
+function updateOnlineStatus() {
+    if (navigator.onLine) {
+        alertEl.textContent = 'Online';
+        alertEl.className = 'online';
+    } else {
+        alertEl.textContent = 'Sin conexión — los datos pueden no estar actualizados';
+        alertEl.className = 'offline';
+    }
+}
+
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
