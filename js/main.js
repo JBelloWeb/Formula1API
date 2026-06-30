@@ -1,21 +1,30 @@
+import { animate, svg } from 'animejs';
+
 const overallAPI = 'https://api.openf1.org/v1/championship_drivers?';
 
 const d = document;
-const nav = d.querySelector('.races');
 const filter = d.querySelector('.teams');
 const container = d.querySelector('.container');
+const gallery = d.getElementById('circuit-gallery');
+const hero = d.getElementById('circuit-hero');
 const scuderias = [];
 const drivers = [];
 const storedFavourites = localStorage.getItem('driversFavoritos');
 const favourites = storedFavourites ? JSON.parse(storedFavourites) :  [];
 const year = d.getElementById('yearSelector');
-const race = d.getElementById('raceSelector');
 const btnToFavs = d.getElementById('toFavs');
 const loader = d.querySelector('.loader');
 const errorReporter = d.getElementById('noConection');
 const btnRetry = d.getElementById('btnRetry');
 
+let selectedMeetingKey = null;
+let circuitsData = {};
+let heroCarAnim = null;
+let heroDrawAnim = null;
+let heroObserver = null;
+
 const LS_DRIVERS_KEY = 'driversData';
+const LS_SESSIONS_KEY = 'sessionsCache_v2';
 
 class driver {
     name = ''
@@ -101,19 +110,192 @@ async function fetchData(urlApi){
     return data;
 }
 
-const getSessionKey = async () =>{
-    try{
-        const data = await fetchData(`https://api.openf1.org/v1/sessions?country_name=${race.value}&year=${year.value}`);
-        let session = data[data.length - 1];
-        let key = session.session_key;
-        return key;   
-    }catch(error){
+const fetchSessions = async (year) => {
+    const cached = localStorage.getItem(`${LS_SESSIONS_KEY}_${year}`);
+    if (cached) return JSON.parse(cached);
+
+    const data = await fetchData(`https://api.openf1.org/v1/sessions?year=${year}`);
+
+    const races = data
+        .filter(s => s.session_type === 'Race' && s.session_name === 'Race')
+        .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
+        .map(s => ({
+            meeting_key: s.meeting_key,
+            country_name: s.country_name,
+            circuit_short_name: s.circuit_short_name,
+            location: s.location,
+            session_key: s.session_key,
+            date_start: s.date_start,
+            is_cancelled: s.is_cancelled
+        }));
+
+    localStorage.setItem(`${LS_SESSIONS_KEY}_${year}`, JSON.stringify(races));
+    return races;
+};
+
+const loadCircuits = async () => {
+    try {
+        const resp = await fetch('assets/circuits.json');
+        circuitsData = await resp.json();
+    } catch (e) {
+        console.warn('No se pudo cargar circuits.json', e);
+    }
+};
+
+const renderCircuitGallery = (sessions) => {
+    gallery.innerHTML = '';
+    const now = new Date();
+
+    for (const s of sessions) {
+        const card = d.createElement('div');
+        card.className = 'gp-card';
+        card.dataset.meetingKey = s.meeting_key;
+
+        const isFuture = new Date(s.date_start) > now;
+        const isCancelled = s.is_cancelled;
+
+        if (isCancelled || isFuture) {
+            card.classList.add('disabled');
+        }
+
+        const svgWrapper = d.createElement('div');
+        svgWrapper.className = 'gp-circuit-svg';
+        const pathD = circuitsData[s.circuit_short_name];
+        if (pathD) {
+            svgWrapper.innerHTML = `<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"><path class="gp-base-path" d="${pathD}"/><path class="gp-draw-path" d="${pathD}"/><circle class="gp-car" r="15" fill="#e4a63a" stroke="#fefefe" stroke-width="2"/></svg>`;
+        }
+
+        const info = d.createElement('div');
+        info.className = 'gp-info';
+        info.innerHTML = `
+            <span class="gp-country">${s.country_name}</span>
+            <span class="gp-circuit-name">${s.circuit_short_name}</span>
+            ${isCancelled ? '<span class="gp-badge cancelled">Cancelada</span>' : ''}
+            ${isFuture ? '<span class="gp-badge future">Próximamente</span>' : ''}
+        `;
+
+        card.appendChild(svgWrapper);
+        card.appendChild(info);
+
+        if (!isCancelled && !isFuture) {
+            const pathEl = svgWrapper.querySelector('.gp-draw-path');
+            const carEl = svgWrapper.querySelector('.gp-car');
+            let hoverAnim = null;
+            let hoverDrawAnim = null;
+
+            card.addEventListener('mouseenter', () => {
+                if (hoverAnim) {
+                    hoverAnim.play();
+                    hoverDrawAnim.play();
+                } else {
+                    hoverAnim = animate(carEl, {
+                        ...svg.createMotionPath(pathEl),
+                        duration: 3000,
+                        loop: true,
+                        ease: 'linear'
+                    });
+                    hoverDrawAnim = animate(svg.createDrawable(pathEl), {
+                        draw: ['0 0', '0 1'],
+                        duration: 3000,
+                        loop: true,
+                        ease: 'linear'
+                    });
+                }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                if (hoverAnim) hoverAnim.pause();
+                if (hoverDrawAnim) hoverDrawAnim.pause();
+            });
+
+            card.addEventListener('click', () => {
+                d.querySelectorAll('.gp-card.selected').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedMeetingKey = s.meeting_key;
+                gallery.classList.add('collapsed');
+                d.querySelector('.gp-back-btn').classList.remove('d-none');
+                showCircuitHero(s.circuit_short_name);
+                getChampionshipInfo();
+            });
+        }
+
+        gallery.appendChild(card);
+    }
+};
+
+const clearCircuitHero = () => {
+    if (heroObserver) heroObserver.disconnect();
+    if (heroCarAnim && typeof heroCarAnim.cancel === 'function') heroCarAnim.cancel();
+    if (heroDrawAnim && typeof heroDrawAnim.cancel === 'function') heroDrawAnim.cancel();
+    heroObserver = null;
+    heroCarAnim = null;
+    heroDrawAnim = null;
+    hero.innerHTML = '';
+    hero.classList.add('d-none');
+    document.getElementById('race-layout').classList.remove('split');
+};
+
+const showCircuitHero = (circuitName) => {
+    clearCircuitHero();
+    const pathD = circuitsData[circuitName];
+    if (!pathD) return;
+
+    hero.innerHTML = `
+        <div class="hero-panel">
+            <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                <path class="hero-base-path" d="${pathD}" />
+                <path class="hero-draw-path" d="${pathD}" />
+                <circle class="hero-car" r="14" />
+            </svg>
+            <span class="hero-circuit-name">${circuitName}</span>
+        </div>
+    `;
+    hero.classList.remove('d-none');
+    document.getElementById('race-layout').classList.add('split');
+
+    const drawPath = hero.querySelector('.hero-draw-path');
+
+    heroDrawAnim = animate(svg.createDrawable(drawPath), {
+        draw: ['0 0', '0 1'],
+        duration: 5500,
+        ease: 'linear'
+    });
+
+    heroCarAnim = animate(hero.querySelector('.hero-car'), {
+        ...svg.createMotionPath(drawPath),
+        duration: 5500,
+        loop: true,
+        ease: 'linear'
+    });
+
+    heroObserver = new IntersectionObserver((entries) => {
+        entries.forEach(e => e.target.classList.toggle('hero-dimmed', !e.isIntersecting));
+    }, { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] });
+    heroObserver.observe(hero);
+};
+
+const getSessionKey = async (meetingKey) => {
+    if (!meetingKey) meetingKey = selectedMeetingKey;
+
+    const cached = localStorage.getItem(`${LS_SESSIONS_KEY}_${year.value}`);
+    if (cached) {
+        const sessions = JSON.parse(cached);
+        const found = sessions.find(s => s.meeting_key === meetingKey);
+        if (found?.session_key) return found.session_key;
+    }
+
+    try {
+        const data = await fetchData(`https://api.openf1.org/v1/sessions?meeting_key=${meetingKey}&session_type=Race&session_name=Race`);
+        return data[0]?.session_key;
+    } catch(error) {
         console.error(error);
         feedbackManager(loader, false);
         feedbackManager(errorReporter, true);
-}}
+    }
+};
 
 const getChampionshipInfo = async() =>{
+    if (!selectedMeetingKey) return;
     let list = d.querySelectorAll('.teams_container');
     for(let l of list){
         l.remove();
@@ -134,7 +316,7 @@ const getChampionshipInfo = async() =>{
 
     try{
         const key = await getSessionKey();
-        const info = await fetchData(`https://api.openf1.org/v1/drivers?session_key= ${key}`);
+        const info = await fetchData(`https://api.openf1.org/v1/drivers?session_key=${key}`);
         for(let n of info){
             let dr = new driver;
             dr.name = n.last_name;
@@ -177,14 +359,24 @@ const getChampionshipInfo = async() =>{
     
 }
 
-if(!loadFromLocalStorage()) {
-    getChampionshipInfo();
-} else {
-    instanciarDrivers();
-    instanciarScuderias();
+(async () => {
+    await loadCircuits();
+    const sessions = await fetchSessions(year.value);
+    renderCircuitGallery(sessions);
+
     feedbackManager(loader, false);
-    getChampionshipInfo();
-}
+
+    if(loadFromLocalStorage()) {
+        instanciarDrivers();
+        instanciarScuderias();
+    }
+})();
+
+d.querySelector('.gp-back-btn').addEventListener('click', () => {
+    gallery.classList.remove('collapsed');
+    d.querySelector('.gp-back-btn').classList.add('d-none');
+    clearCircuitHero();
+});
 
 const inArray = (array, name) =>{
     return array.includes(name);
@@ -197,7 +389,7 @@ const defineStyle = (name) =>{
 
 const gestionarFavoritos = (nombre) =>{
     let favs = JSON.parse(localStorage.getItem('driversFavoritos')) || [];
-    inArray(favs, nombre) ? favs.splice(i => {favs.indexOf(nombre)}, 1) : favs.push(nombre);
+    inArray(favs, nombre) ? favs.splice(favs.indexOf(nombre), 1) : favs.push(nombre);
 
     localStorage.setItem('driversFavoritos', JSON.stringify(favs));
     localStorage.removeItem('favsData'); // invalidar cache de detalles de favoritos
@@ -317,9 +509,6 @@ const filterDrivers = (scuderia) =>{
 }}
 
 
-instanciarDrivers();
-
-
 const getInfo = async (num, mod) =>{
     try{
         const r = await getSessionKey();
@@ -335,32 +524,21 @@ const getInfo = async (num, mod) =>{
         return 'Error';
     }
 }
-race.addEventListener('change', ()=>{
-    instanciarDrivers();
-    let options = year.querySelectorAll('option');
-    if(!(race.value == 'China' || race.value == 'Australia' || race.value == 'Japan')){
-        options.forEach(y =>{
-            if(y.value == '2026') y.disabled = true;
-        })
-    } else{
-        options.forEach(o => {
-            o.disabled = false;
-        });
-    }
-})
-
-year.addEventListener('change', () =>{
-    let options = race.querySelectorAll('option');
-    if(year.value == '2026'){
-        options.forEach(o => {
-            if(!(o.value == 'China' || o.value == 'Australia' || o.value == 'Japan')) o.disabled = true;
-        });
-    }else{
-        options.forEach(o => {
-            o.disabled = false;
-        });
-    }
-    getChampionshipInfo();
+year.addEventListener('change', async () => {
+    selectedMeetingKey = null;
+    gallery.classList.remove('collapsed');
+    d.querySelector('.gp-back-btn').classList.add('d-none');
+    clearCircuitHero();
+    const sessions = await fetchSessions(year.value);
+    renderCircuitGallery(sessions);
+    let list = d.querySelectorAll('.teams_container');
+    for(let l of list) l.remove();
+    let cleanTeams = d.querySelectorAll('.team');
+    let cleanDrivers = d.querySelectorAll('.card');
+    for(let c of cleanTeams) c.remove();
+    for(let c of cleanDrivers) c.remove();
+    drivers.splice(0, drivers.length);
+    scuderias.splice(0, scuderias.length);
 })
 
 btnToFavs.addEventListener('click', () =>{

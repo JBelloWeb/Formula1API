@@ -85,7 +85,6 @@ button{
 h1{
     text-align: center;
     padding: 2rem 0;
-    margin: 1rem 0;
     margin-bottom: 0;
     color: white;
     background-color: var(--main-red);
@@ -107,20 +106,24 @@ h1{
     align-items: center;
     flex-wrap: wrap;
     gap: 0.2rem;
+    padding-top: 20px;
 
     width: 100%;
     background-color: var(--main-red);
 }
 
 #add-alert {
-    padding: 0.35rem 1rem;
-    border-radius: 6px;
-    font-size: 0.7rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    padding: 0.25rem 0;
+    font-size: 0.65rem;
     font-weight: 700;
     text-align: center;
-    transition: background 0.3s, color 0.3s;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    transition: background 0.3s, color 0.3s;
 }
 #add-alert.online {
     background: #1e7e34;
@@ -515,6 +518,160 @@ button.fav{
     display: none;
 }
 
+select option.cancelled {
+    text-decoration: line-through;
+    opacity: 0.55;
+}
+
+select option.future {
+    opacity: 0.55;
+}
+
+#circuit-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem 1rem 1rem;
+    margin: 0 auto;
+    max-width: 1200px;
+    max-height: 3000px;
+    overflow: hidden;
+    opacity: 1;
+    transition: max-height 0.45s ease, opacity 0.35s ease, padding 0.35s ease, margin 0.35s ease;
+}
+
+#circuit-gallery.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.gp-back-btn {
+    display: block;
+    margin: 1rem auto 0;
+    padding: 0.5rem 1.5rem;
+    background: transparent;
+    border: 2px solid var(--main-color);
+    color: var(--main-color);
+    font-family: f1_font, sans-serif;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.gp-back-btn:hover {
+    background: var(--main-color);
+    color: var(--secondary-color);
+}
+
+.gp-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 160px;
+    background: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    gap: 0.5rem;
+}
+
+.gp-card:not(.disabled):hover {
+    border-color: var(--main-color);
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px rgba(228, 166, 58, 0.15);
+}
+
+.gp-card.selected {
+    border-color: var(--main-color);
+    box-shadow: 0 0 20px rgba(228, 166, 58, 0.3);
+}
+
+.gp-card.disabled {
+    opacity: 0.45;
+    cursor: default;
+    filter: grayscale(0.5);
+}
+
+.gp-circuit-svg {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gp-circuit-svg svg {
+    width: 100%;
+    height: 100%;
+    color: var(--main-color);
+}
+
+.gp-circuit-svg .gp-base-path,
+.gp-circuit-svg .gp-draw-path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 15;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.gp-circuit-svg .gp-base-path {
+    stroke-opacity: 0.1;
+}
+
+.gp-card.disabled .gp-circuit-svg svg {
+    color: #666;
+}
+
+.gp-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.15rem;
+    width: 100%;
+}
+
+.gp-country {
+    color: var(--main-white);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.gp-circuit-name {
+    color: var(--main-gray);
+    font-size: 0.65rem;
+}
+
+.gp-badge {
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    margin-top: 0.2rem;
+}
+
+.gp-badge.cancelled {
+    background: rgba(213, 15, 15, 0.2);
+    color: var(--main-red);
+}
+
+.gp-badge.future {
+    background: rgba(228, 166, 58, 0.15);
+    color: var(--main-color);
+}
+
 .card .disabled{
     background-color: transparent;
     outline: 2px solid var(--main-color);
@@ -577,8 +734,189 @@ footer{
     }
 }
 
+#race-layout {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+#race-layout.split {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem;
+    align-items: flex-start;
+    box-sizing: border-box;
+}
+#race-layout.split .container {
+    display: grid;
+    justify-content: center;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 2rem;
+}
+#race-layout.split .card {
+    width: 80%;
+    height: 280px;
+    aspect-ratio: auto;
+    padding: 0.4rem;
+    gap: 0.4rem;
+    outline-width: 3px;
+    margin: 0 auto;
+}
+#race-layout.split .card h2 {
+    font-size: 0.85rem;
+    padding: 0.5rem 0;
+}
+#race-layout.split .card button.info {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.8rem;
+}
+#race-layout.split .card button.fav {
+    width: 1.8rem;
+    height: 1.8rem;
+    padding: 0.2rem;
+}
+#race-layout.split .card button.fav i {
+    font-size: 0.85rem;
+}
+#race-layout.split .card figure {
+    width: 24px;
+    top: -12px;
+    right: -12px;
+}
+#race-layout.split .card::before {
+    width: 24px;
+    top: -12px;
+    right: -12px;
+    outline-width: 3px;
+}
+#race-layout.split .card li {
+    font-size: 0.75rem;
+}
+#race-layout.split #circuit-hero {
+    flex: 0 0 30%;
+    position: sticky;
+    top: 60px;
+    padding-top: 7.5rem;
+}
+#race-layout.split .cards-panel {
+    flex: 1 1 70%;
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    #race-layout.split {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #race-layout.split #circuit-hero {
+        flex: none;
+        position: static;
+        max-width: 400px;
+        margin: 0 auto;
+        transition: opacity 0.3s;
+    }
+    #race-layout.split .cards-panel {
+        flex: none;
+        width: 100%;
+    }
+    #race-layout.split .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 2rem;
+    }
+    #race-layout.split .card {
+        width: 60%;
+        height: 300px;
+        aspect-ratio: auto;
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+    #race-layout.split #circuit-hero.hero-dimmed {
+        opacity: 0.3;
+    }
+    #race-layout.split #circuit-hero.hero-dimmed .hero-draw-path,
+    #race-layout.split #circuit-hero.hero-dimmed .hero-car {
+        filter: none;
+    }
+    #race-layout.split #circuit-hero.hero-dimmed .hero-draw-path {
+        stroke-opacity: 0.2;
+    }
+    #race-layout.split #circuit-hero.hero-dimmed .hero-base-path {
+        stroke-opacity: 0.06;
+    }
+    #race-layout.split #circuit-hero.hero-dimmed .hero-car {
+        opacity: 0.2;
+    }
+}
+
+.hero-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+.hero-circuit-name {
+    color: var(--main-white);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+}
+
+#circuit-hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem auto;
+    max-width: 500px;
+    position: relative;
+}
+
+#circuit-hero svg {
+    width: 100%;
+    height: auto;
+}
+
+#circuit-hero .hero-base-path {
+    stroke: var(--main-color);
+    stroke-opacity: 0.12;
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#circuit-hero .hero-draw-path {
+    stroke: var(--main-color);
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 4px var(--main-color));
+}
+
+.hero-car {
+    fill: var(--main-color);
+    stroke: var(--main-white);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 6px var(--main-color));
+}
+
+.gp-car {
+    fill: var(--main-color);
+    stroke: var(--main-white);
+    stroke-width: 2;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.gp-card:not(.disabled):hover .gp-car {
+    opacity: 1;
+}
+
 @media (min-width: 520px){
-    .container, #favSection{
+.container, #favSection{
     padding: 0 2rem;
     gap: 5rem;
 }

@@ -9,8 +9,8 @@ if('serviceWorker' in navigator){
     if(window.Notification){
         Notification.requestPermission().then((perimission) =>{
             if(perimission === 'granted'){
-                const noti = new Notification("Aquí va el titulo", {
-                    body: "Soy una notificación local",
+                const noti = new Notification("¡Bienvenido a la parrilla!", {
+                    body: "Explorá pilotos, circuitos y resultados de F1",
                     icon: 'favicon.ico',
                 });
             } else {
@@ -31,6 +31,7 @@ if('serviceWorker' in navigator){
     });
 
     const showAddToHomeScreen = () => {
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
         let showAlert = document.querySelector('#share');
         if (!showAlert) return;
         showAlert.classList.remove('d-none');
@@ -69,6 +70,7 @@ if('serviceWorker' in navigator){
                 url: 'https://'
             })
             .then(() =>{
+                shareBtn.classList.add('d-none');
                 console.log('se compartio')
             })
             .catch((error) =>{
