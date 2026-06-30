@@ -1,5 +1,5 @@
-let cacheName = 'cache-v2';
-let cacheDynamic = 'cache2-v2';
+let cacheName = 'cache-v3';
+let cacheDynamic = 'cache2-v3';
 let appShell = [
     'index.html',
     'pages/favourites.html',
